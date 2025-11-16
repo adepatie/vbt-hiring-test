@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Minimal Estimates Workflow Data Model
+
+enum EstimateStage {
+  ARTIFACTS
+  BUSINESS_CASE
+  REQUIREMENTS
+  SOLUTION
+  EFFORT
+  QUOTE
+  DELIVERED
+}
+
+model Project {
+  id        String        @id @default(cuid())
+  name      String
+  clientName String?
+  stage     EstimateStage @default(ARTIFACTS)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  // Relations
+  artifacts    Artifact[]
+  businessCase BusinessCase?
+  requirements Requirements?
+  solution     SolutionArchitecture?
+  wbsItems     WBSItem[]
+  quote        Quote?
+  stageHistory StageTransition[]
+}
+
+model Artifact {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+
+  type      String    // keep minimal: "note", "file", "doc", etc.
+  content   String?   // raw text or extracted content
+  url       String?   // for uploaded files
+  createdAt DateTime @default(now())
+}
+
+model BusinessCase {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  project   Project  @relation(fields: [projectId], references: [id])
+
+  content   String   // merged LLM output + user edits
+  approved  Boolean  @default(false)
+}
+
+model Requirements {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  project   Project  @relation(fields: [projectId], references: [id])
+
+  content   String
+  approved  Boolean  @default(false)
+}
+
+model SolutionArchitecture {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  project   Project  @relation(fields: [projectId], references: [id])
+
+  content   String
+  approved  Boolean  @default(false)
+}
+
+model WBSItem {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  task      String
+  role      String
+  hours     Float
+}
+
+model Quote {
+  id           String   @id @default(cuid())
+  projectId    String   @unique
+  project      Project  @relation(fields: [projectId], references: [id])
+
+  rates        Json?     // role → rate
+  paymentTerms String?
+  timeline     String?
+
+  total        Float?
+  delivered    Boolean   @default(false)
+}
+
+model StageTransition {
+  id        String        @id @default(cuid())
+  projectId String
+  project   Project       @relation(fields: [projectId], references: [id])
+
+  from      EstimateStage
+  to        EstimateStage
+  timestamp DateTime       @default(now())
+}

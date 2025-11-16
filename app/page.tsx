@@ -1,66 +1,78 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { ArrowForwardIcon } from "@chakra-ui/icons";
+import {
+  Button,
+  Box,
+  Container,
+  Heading,
+  SimpleGrid,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import Link from "next/link";
+
+const workflows = [
+  {
+    title: "Estimates",
+    description:
+      "Track the six-stage estimate workflow, WBS progress, and approvals.",
+    href: "/estimates",
+  },
+  {
+    title: "Contracts",
+    description:
+      "Manage policy rules, agreement versions, and client review proposals.",
+    href: "/contracts",
+  },
+];
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
+    <Container maxW="5xl" py={{ base: 12, md: 20 }}>
+      <Stack spacing={10}>
+        <Stack spacing={3}>
+          <Heading size="lg">Workflow Dashboard</Heading>
+          <Text color="gray.600">
+            Thin-slice overview of Estimates and Contracts with Copilot entry
+            points.
+          </Text>
+        </Stack>
+
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+          {workflows.map((workflow) => (
+            <Box
+              key={workflow.title}
+              borderWidth="1px"
+              borderRadius="lg"
+              p={6}
+              bg="white"
+              shadow="sm"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+              <Stack spacing={4}>
+                <Stack spacing={1}>
+                  <Heading size="md">{workflow.title}</Heading>
+                  <Text color="gray.600">{workflow.description}</Text>
+                </Stack>
+                <Stack fontSize="sm" color="gray.500" spacing={1}>
+                  <Text>Count: --</Text>
+                  <Text>Last updated: --</Text>
+                </Stack>
+                <Button
+                  as={Link}
+                  href={workflow.href}
+                  rightIcon={<ArrowForwardIcon />}
+                  alignSelf="flex-start"
+                  variant="solid"
+                  colorScheme="purple"
+                >
+                  View {workflow.title}
+                </Button>
+              </Stack>
+            </Box>
+          ))}
+        </SimpleGrid>
+      </Stack>
+    </Container>
   );
 }

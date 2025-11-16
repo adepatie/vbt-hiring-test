@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: vbt-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: vbt
+      POSTGRES_PASSWORD: vbt
+      POSTGRES_DB: vbt_hiring_test
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vbt -d vbt_hiring_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+
