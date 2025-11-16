@@ -1,4 +1,3 @@
-import { Container } from "@chakra-ui/react";
 import { notFound } from "next/navigation";
 import { estimatesService } from "@/lib/services/estimatesService";
 import {
@@ -7,14 +6,15 @@ import {
 } from "./project-detail-view";
 
 type EstimateDetailPageProps = {
-  params: { projectId: string };
+  params: Promise<{ projectId: string }>;
 };
 
 export default async function EstimateDetailPage({
   params,
 }: EstimateDetailPageProps) {
+  const { projectId } = await params;
   const project = await estimatesService
-    .getProjectWithDetails(params.projectId)
+    .getProjectWithDetails(projectId)
     .catch(() => null);
 
   if (!project) {
@@ -37,12 +37,12 @@ export default async function EstimateDetailPage({
   };
 
   return (
-    <Container maxW="6xl" py={{ base: 10, md: 16 }}>
+    <main className="container max-w-6xl py-10 md:py-16">
       <ProjectDetailView
         key={`${serializableProject.id}-${serializableProject.stage}`}
         project={serializableProject}
       />
-    </Container>
+    </main>
   );
 }
 

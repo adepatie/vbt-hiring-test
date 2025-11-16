@@ -1,14 +1,12 @@
-import { Container, Skeleton, Stack } from "@chakra-ui/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EstimatesLoading() {
   return (
-    <Container maxW="6xl" py={{ base: 10, md: 16 }}>
-      <Stack spacing={8}>
-        <Skeleton height="40px" width="260px" borderRadius="md" />
-        <Skeleton height="220px" borderRadius="lg" />
-        <Skeleton height="360px" borderRadius="lg" />
-      </Stack>
-    </Container>
+    <div className="container max-w-6xl py-10 md:py-16 space-y-8">
+      <Skeleton className="h-10 w-64" />
+      <Skeleton className="h-56 rounded-xl" />
+      <Skeleton className="h-80 rounded-xl" />
+    </div>
   );
 }
 

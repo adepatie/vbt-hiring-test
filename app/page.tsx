@@ -1,16 +1,15 @@
-"use client";
-
-import { ArrowForwardIcon } from "@chakra-ui/icons";
-import {
-  Button,
-  Box,
-  Container,
-  Heading,
-  SimpleGrid,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+
+import { buttonVariants } from "@/lib/ui/button-variants";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 const workflows = [
   {
@@ -29,50 +28,40 @@ const workflows = [
 
 export default function Home() {
   return (
-    <Container maxW="5xl" py={{ base: 12, md: 20 }}>
-      <Stack spacing={10}>
-        <Stack spacing={3}>
-          <Heading size="lg">Workflow Dashboard</Heading>
-          <Text color="gray.600">
-            Thin-slice overview of Estimates and Contracts with Copilot entry
-            points.
-          </Text>
-        </Stack>
+    <main className="container max-w-5xl py-12 md:py-20 space-y-10">
+      <div className="space-y-3">
+        <h1 className="text-3xl font-semibold tracking-tight">Workflow Dashboard</h1>
+        <p className="text-muted-foreground">
+          Thin-slice overview of Estimates and Contracts with Copilot entry points.
+        </p>
+      </div>
 
-        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-          {workflows.map((workflow) => (
-            <Box
-              key={workflow.title}
-              borderWidth="1px"
-              borderRadius="lg"
-              p={6}
-              bg="white"
-              shadow="sm"
-            >
-              <Stack spacing={4}>
-                <Stack spacing={1}>
-                  <Heading size="md">{workflow.title}</Heading>
-                  <Text color="gray.600">{workflow.description}</Text>
-                </Stack>
-                <Stack fontSize="sm" color="gray.500" spacing={1}>
-                  <Text>Count: --</Text>
-                  <Text>Last updated: --</Text>
-                </Stack>
-                <Button
-                  as={Link}
-                  href={workflow.href}
-                  rightIcon={<ArrowForwardIcon />}
-                  alignSelf="flex-start"
-                  variant="solid"
-                  colorScheme="purple"
-                >
-                  View {workflow.title}
-                </Button>
-              </Stack>
-            </Box>
-          ))}
-        </SimpleGrid>
-      </Stack>
-    </Container>
+      <div className="grid gap-6 md:grid-cols-2">
+        {workflows.map((workflow) => (
+          <Card key={workflow.title} className="shadow-sm">
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-2xl">{workflow.title}</CardTitle>
+              <CardDescription>{workflow.description}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p>Count: --</p>
+                <p>Last updated: --</p>
+              </div>
+              <Link
+                href={workflow.href}
+                className={cn(
+                  buttonVariants({ variant: "default" }),
+                  "inline-flex items-center gap-2",
+                )}
+              >
+                View {workflow.title}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </main>
   );
 }

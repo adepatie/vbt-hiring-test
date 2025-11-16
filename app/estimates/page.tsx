@@ -1,4 +1,3 @@
-import { Container, Heading, Stack, Text } from "@chakra-ui/react";
 import { estimatesService } from "@/lib/services/estimatesService";
 import { ProjectList, type ProjectListProject } from "./project-list";
 
@@ -14,18 +13,15 @@ export default async function EstimatesPage() {
   }));
 
   return (
-    <Container maxW="6xl" py={{ base: 10, md: 16 }}>
-      <Stack spacing={8}>
-        <Stack spacing={2}>
-          <Heading size="lg">Estimates</Heading>
-          <Text color="gray.600">
-            Track every project estimate, manage stage progress, and capture new
-            work in one place.
-          </Text>
-        </Stack>
-        <ProjectList projects={serializableProjects} />
-      </Stack>
-    </Container>
+    <main className="container max-w-6xl py-10 md:py-16 space-y-8">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-semibold tracking-tight">Estimates</h1>
+        <p className="text-muted-foreground">
+          Track every project estimate, manage stage progress, and capture new work in one place.
+        </p>
+      </div>
+      <ProjectList projects={serializableProjects} />
+    </main>
   );
 }
 

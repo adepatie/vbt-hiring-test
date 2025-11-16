@@ -1,22 +1,26 @@
-import { Container, Heading, Stack, Text } from "@chakra-ui/react";
-
 type AgreementDetailPageProps = {
-  params: { agreementId: string };
+  params: Promise<{ agreementId: string }>;
 };
 
-export default function AgreementDetailPage({
+export default async function AgreementDetailPage({
   params,
 }: AgreementDetailPageProps) {
+  const { agreementId } = await params;
   return (
-    <Container maxW="5xl" py={{ base: 10, md: 16 }}>
-      <Stack spacing={4}>
-        <Heading size="lg">Agreement #{params.agreementId}</Heading>
-        <Text color="gray.600">
-          Agreement version selector, policy alignment, and Copilot review UI
-          will be scaffolded here.
-        </Text>
-      </Stack>
-    </Container>
+    <main className="container max-w-5xl py-10 md:py-16 space-y-4">
+      <div className="space-y-2">
+        <p className="text-sm uppercase tracking-wide text-muted-foreground">
+          Agreement detail
+        </p>
+        <h1 className="text-3xl font-semibold tracking-tight">
+          Agreement #{agreementId}
+        </h1>
+        <p className="text-muted-foreground">
+          Agreement version selector, policy alignment, and Copilot review UI will be
+          scaffolded here.
+        </p>
+      </div>
+    </main>
   );
 }
 

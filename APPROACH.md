@@ -33,3 +33,5 @@ Next I want to have the agent setup our postgres instance. One annoying part of 
 Next I had the agent plan and build a basic version of the Estimates workflow that didn't include LLM integration. It resulted in a few errors which I would paste one-by-one into the chat. I tried to get it to browse throught he errors itself but it doesn't seem to consistently do this.
 
 I'm seeing that while I enjoy writing apps using ChakraUI, GPT 5.1 Codex High is having a hard time understanding how to use it. Maybe a different more popular UI library would be a better choice for this project.
+
+I decided to switch to shadcn UI based on GPT's recommendation. 

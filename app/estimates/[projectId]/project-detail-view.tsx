@@ -1,39 +1,33 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import {
-  Alert,
-  AlertIcon,
-  Badge,
-  Box,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Checkbox,
-  Field,
-  Flex,
-  Grid,
-  GridItem,
-  Heading,
-  HStack,
-  IconButton,
-  Input,
-  Link as ChakraLink,
-  SimpleGrid,
-  Stack,
-  Stat,
-  StatLabel,
-  StatNumber,
-  Text,
-  Textarea,
-  Tooltip,
-} from "@chakra-ui/react";
-import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/navigation";
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Info,
+  Plus,
+  Trash2,
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardBody,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
+import { formatEstimateStageLabel } from "@/lib/utils/estimates";
+import { appToaster } from "@/lib/ui/toaster";
 import {
   type Artifact,
   type BusinessCase,
@@ -44,14 +38,10 @@ import {
   type SolutionArchitecture,
   type StageTransition,
   type WbsItem,
-} from "@/lib/zod/estimates";
-import {
   estimateStageOrder,
   stageContentInputSchema,
   wbsItemInputSchema,
 } from "@/lib/zod/estimates";
-import { formatEstimateStageLabel } from "@/lib/utils/estimates";
-import { appToaster } from "@/lib/ui/toaster";
 import {
   addArtifactAction,
   advanceStageAction,
@@ -220,6 +210,16 @@ const normalizeWbsItems = (items: WbsItem[]) =>
     hours,
   }));
 
+const stageBadgeClass: Record<EstimateStage, string> = {
+  ARTIFACTS: "bg-slate-100 text-slate-700",
+  BUSINESS_CASE: "bg-purple-100 text-purple-700",
+  REQUIREMENTS: "bg-blue-100 text-blue-700",
+  SOLUTION: "bg-teal-100 text-teal-700",
+  EFFORT: "bg-amber-100 text-amber-800",
+  QUOTE: "bg-orange-100 text-orange-800",
+  DELIVERED: "bg-emerald-100 text-emerald-800",
+};
+
 export function ProjectDetailView({ project }: { project: ProjectDetailClient }) {
   const [selectedStage, setSelectedStage] = useState<EstimateStage>(
     () => project.stage,
@@ -244,38 +244,38 @@ export function ProjectDetailView({ project }: { project: ProjectDetailClient })
   );
 
   return (
-    <Stack spacing={8}>
-      <Card>
-        <CardHeader>
-          <Flex justify="space-between" align="flex-start" direction={{ base: "column", md: "row" }}>
-            <Stack spacing={1}>
-              <Heading size="lg">{project.name}</Heading>
-              <Text color="gray.600">{project.clientName ?? "Unassigned client"}</Text>
-            </Stack>
-            <Badge colorScheme="blue" alignSelf="flex-start" mt={{ base: 4, md: 0 }}>
-              Current stage: {formatEstimateStageLabel(project.stage)}
-            </Badge>
-          </Flex>
+    <div className="flex flex-col gap-8">
+      <Card className="shadow-sm">
+        <CardHeader className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="space-y-1">
+            <CardTitle className="text-2xl">{project.name}</CardTitle>
+            <CardDescription>
+              {project.clientName ?? "Unassigned client"}
+            </CardDescription>
+          </div>
+          <Badge className={cn("px-4 py-1 text-sm font-medium", stageBadgeClass[project.stage])}>
+            Current stage: {formatEstimateStageLabel(project.stage)}
+          </Badge>
         </CardHeader>
         <CardBody>
-          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
-            <Stat>
-              <StatLabel>Created</StatLabel>
-              <StatNumber fontSize="md">
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="rounded-lg border bg-muted/20 p-4">
+              <p className="text-sm font-medium text-muted-foreground">Created</p>
+              <p className="text-lg font-semibold">
                 {dateTimeFormat.format(new Date(project.createdAt))}
-              </StatNumber>
-            </Stat>
-            <Stat>
-              <StatLabel>Last updated</StatLabel>
-              <StatNumber fontSize="md">
+              </p>
+            </div>
+            <div className="rounded-lg border bg-muted/20 p-4">
+              <p className="text-sm font-medium text-muted-foreground">Last updated</p>
+              <p className="text-lg font-semibold">
                 {dateTimeFormat.format(new Date(project.updatedAt))}
-              </StatNumber>
-            </Stat>
-            <Stat>
-              <StatLabel>Total WBS hours</StatLabel>
-              <StatNumber fontSize="md">{totalWbsHours || "—"}</StatNumber>
-            </Stat>
-          </SimpleGrid>
+              </p>
+            </div>
+            <div className="rounded-lg border bg-muted/20 p-4">
+              <p className="text-sm font-medium text-muted-foreground">Total WBS hours</p>
+              <p className="text-lg font-semibold">{totalWbsHours || "—"}</p>
+            </div>
+          </div>
         </CardBody>
       </Card>
 
@@ -285,18 +285,16 @@ export function ProjectDetailView({ project }: { project: ProjectDetailClient })
         onSelect={setSelectedStage}
       />
 
-      <Card>
-        <CardHeader>
-          <Stack spacing={2}>
-            <Heading size="md">{meta.title}</Heading>
-            <Text color="gray.600">{meta.summary}</Text>
-            <Alert status="info" variant="left-accent">
-              <AlertIcon />
-              {meta.entryCriteria}
-            </Alert>
-          </Stack>
+      <Card className="shadow-sm">
+        <CardHeader className="space-y-2">
+          <CardTitle className="text-xl">{meta.title}</CardTitle>
+          <CardDescription>{meta.summary}</CardDescription>
+          <Alert variant="info">
+            <Info className="h-4 w-4" />
+            <AlertDescription>{meta.entryCriteria}</AlertDescription>
+          </Alert>
         </CardHeader>
-        <CardBody>
+        <CardBody className="space-y-4">
           {meta.type === "artifacts" && (
             <ArtifactsPanel
               projectId={project.id}
@@ -329,82 +327,66 @@ export function ProjectDetailView({ project }: { project: ProjectDetailClient })
             />
           )}
           {meta.type === "summary" && (
-            <Stack spacing={4}>
-              <Text>
-                This estimate has been delivered to the client. Use the controls
-                below to review prior stages or update supporting artifacts.
-              </Text>
+            <div className="space-y-4">
+              <p>
+                This estimate has been delivered to the client. Use the controls below to review prior
+                stages or update supporting artifacts.
+              </p>
               {project.quote && (
-                <Box borderWidth="1px" borderRadius="md" p={4}>
-                  <Text fontWeight="semibold" mb={2}>
-                    Final quote summary
-                  </Text>
+                <div className="rounded-lg border bg-card p-4 shadow-sm">
+                  <p className="font-semibold mb-2">Final quote summary</p>
                   {project.quote.paymentTerms && (
-                    <Text color="gray.700">
+                    <p className="text-sm text-muted-foreground">
                       Payment terms: {project.quote.paymentTerms}
-                    </Text>
+                    </p>
                   )}
                   {project.quote.timeline && (
-                    <Text color="gray.700">
+                    <p className="text-sm text-muted-foreground">
                       Timeline: {project.quote.timeline}
-                    </Text>
+                    </p>
                   )}
                   {typeof project.quote.total === "number" && (
-                    <Text color="gray.700">
+                    <p className="text-sm text-muted-foreground">
                       Total: ${project.quote.total.toLocaleString()}
-                    </Text>
+                    </p>
                   )}
-                </Box>
+                </div>
               )}
-            </Stack>
+            </div>
           )}
         </CardBody>
       </Card>
 
-      <Grid templateColumns={{ base: "1fr", lg: "2fr 1fr" }} gap={6}>
-        <GridItem>
-          <StageTimeline transitions={project.stageTransitions} />
-        </GridItem>
-        <GridItem>
-          <Card>
-            <CardHeader>
-              <Heading size="md">Artifacts overview</Heading>
-            </CardHeader>
-            <CardBody>
-              <Stack spacing={3}>
-                <Text color="gray.600">
-                  {project.artifacts.length} artifact
-                  {project.artifacts.length === 1 ? "" : "s"} captured.
-                </Text>
-                <Stack spacing={2}>
-                  {project.artifacts.slice(0, 3).map((artifact) => (
-                    <Box
-                      key={artifact.id}
-                      borderWidth="1px"
-                      borderRadius="md"
-                      p={3}
-                    >
-                      <Text fontWeight="semibold">{artifact.type}</Text>
-                      {artifact.content && (
-                        <Text color="gray.600" noOfLines={2}>
-                          {artifact.content}
-                        </Text>
-                      )}
-                      <Text fontSize="sm" color="gray.500">
-                        Added {dateTimeFormat.format(new Date(artifact.createdAt))}
-                      </Text>
-                    </Box>
-                  ))}
-                  {project.artifacts.length === 0 && (
-                    <Text color="gray.500">No artifacts yet.</Text>
+      <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
+        <StageTimeline transitions={project.stageTransitions} />
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg">Artifacts overview</CardTitle>
+          </CardHeader>
+          <CardBody className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              {project.artifacts.length} artifact{project.artifacts.length === 1 ? "" : "s"} captured.
+            </p>
+            <div className="space-y-2">
+              {project.artifacts.slice(0, 3).map((artifact) => (
+                <div key={artifact.id} className="rounded-lg border p-3">
+                  <p className="font-semibold">{artifact.type}</p>
+                  {artifact.content && (
+                    <p className="text-sm text-muted-foreground line-clamp-2">{artifact.content}</p>
                   )}
-                </Stack>
-              </Stack>
-            </CardBody>
-          </Card>
-        </GridItem>
-      </Grid>
-    </Stack>
+                  <p className="text-xs text-muted-foreground">
+                    Added {dateTimeFormat.format(new Date(artifact.createdAt))}
+                  </p>
+                </div>
+              ))}
+              {project.artifacts.length === 0 && (
+                <p className="text-sm text-muted-foreground">No artifacts yet.</p>
+              )}
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+    </div>
   );
 }
 
@@ -420,35 +402,30 @@ function StageNavigator({
   const currentIdx = estimateStageOrder.indexOf(currentStage);
 
   return (
-    <Card>
+    <Card className="shadow-sm">
       <CardBody>
-        <Stack
-          direction={{ base: "column", md: "row" }}
-          spacing={3}
-          flexWrap="wrap"
-        >
+        <div className="flex flex-wrap gap-3">
           {estimateStageOrder.map((stage, index) => {
             const isCurrent = stage === selectedStage;
             const isComplete = index < currentIdx;
-            const colorScheme = isCurrent
-              ? "blue"
-              : isComplete
-                ? "green"
-                : "gray";
 
             return (
               <Button
                 key={stage}
-                variant={isCurrent ? "solid" : "outline"}
-                colorScheme={colorScheme}
-                size="sm"
+                variant={isCurrent ? "default" : "outline"}
+                className={cn(
+                  "text-sm",
+                  isComplete && !isCurrent
+                    ? "border-green-200 text-green-700 hover:bg-green-50"
+                    : null,
+                )}
                 onClick={() => onSelect(stage)}
               >
                 {formatEstimateStageLabel(stage)}
               </Button>
             );
           })}
-        </Stack>
+        </div>
       </CardBody>
     </Card>
   );
@@ -521,98 +498,110 @@ function ArtifactsPanel({
   };
 
   return (
-    <Stack spacing={6}>
-      <Stack spacing={3}>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3">
         {artifacts.length === 0 && (
-          <Text color="gray.500">No artifacts have been added yet.</Text>
+          <p className="text-sm text-muted-foreground">
+            No artifacts have been added yet.
+          </p>
         )}
         {artifacts.map((artifact) => (
-          <Box
+          <div
             key={artifact.id}
-            borderWidth="1px"
-            borderRadius="md"
-            p={4}
-            position="relative"
+            className="rounded-lg border bg-card p-4 shadow-sm"
           >
-            <Flex justify="space-between" align="flex-start" gap={4}>
-              <Stack spacing={1}>
-                <Text fontWeight="semibold">{artifact.type}</Text>
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div className="space-y-2">
+                <p className="font-semibold">{artifact.type}</p>
                 {artifact.url && (
-                  <ChakraLink
+                  <a
                     href={artifact.url}
-                    color="blue.500"
-                    isExternal
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm text-primary break-all"
                   >
                     {artifact.url}
-                  </ChakraLink>
+                  </a>
                 )}
                 {artifact.content && (
-                  <Text color="gray.700" whiteSpace="pre-wrap">
+                  <p className="whitespace-pre-wrap text-sm text-muted-foreground">
                     {artifact.content}
-                  </Text>
+                  </p>
                 )}
-                <Text fontSize="sm" color="gray.500">
+                <p className="text-xs text-muted-foreground">
                   Added {dateTimeFormat.format(new Date(artifact.createdAt))}
-                </Text>
-              </Stack>
+                </p>
+              </div>
               {canEdit && (
-                <IconButton
-                  aria-label="Remove artifact"
-                  icon={<DeleteIcon />}
-                  size="sm"
+                <Button
+                  type="button"
                   variant="ghost"
-                  colorScheme="red"
+                  size="icon"
+                  className="text-muted-foreground hover:text-destructive"
                   onClick={() => handleRemove(artifact.id)}
-                  isDisabled={isPending}
-                />
+                  disabled={isPending}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               )}
-            </Flex>
-          </Box>
+            </div>
+          </div>
         ))}
-      </Stack>
+      </div>
 
       {canEdit && (
-        <Stack
-          as="form"
-          spacing={4}
+        <form
+          className="space-y-4 rounded-lg border bg-card p-4 shadow-sm"
           onSubmit={handleSubmit(onSubmit)}
           noValidate
         >
-          <Heading size="sm">Add artifact</Heading>
-          <Field.Root invalid={Boolean(errors.type)}>
-            <Field.Label>Type</Field.Label>
-            <Input placeholder="Brief, notes, doc link..." {...register("type")} />
-            <Field.ErrorText>{errors.type?.message}</Field.ErrorText>
-          </Field.Root>
-          <Field.Root invalid={Boolean(errors.url)}>
-            <Field.Label>URL (optional)</Field.Label>
-            <Input placeholder="https://..." {...register("url")} />
-            <Field.ErrorText>{errors.url?.message}</Field.ErrorText>
-          </Field.Root>
-          <Field.Root invalid={Boolean(errors.content)}>
-            <Field.Label>Notes (optional)</Field.Label>
-            <Textarea rows={4} {...register("content")} />
-            <Field.ErrorText>{errors.content?.message}</Field.ErrorText>
-          </Field.Root>
+          <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Add artifact
+          </p>
+          <div className="space-y-1">
+            <label className="text-sm font-medium">Type</label>
+            <Input
+              placeholder="Brief, notes, doc link..."
+              {...register("type")}
+              disabled={isPending}
+            />
+            {errors.type && (
+              <p className="text-sm text-destructive">{errors.type.message}</p>
+            )}
+          </div>
+          <div className="space-y-1">
+            <label className="text-sm font-medium">URL (optional)</label>
+            <Input placeholder="https://..." {...register("url")} disabled={isPending} />
+            {errors.url && (
+              <p className="text-sm text-destructive">{errors.url.message}</p>
+            )}
+          </div>
+          <div className="space-y-1">
+            <label className="text-sm font-medium">Notes (optional)</label>
+            <Textarea rows={4} {...register("content")} disabled={isPending} />
+            {errors.content && (
+              <p className="text-sm text-destructive">{errors.content.message}</p>
+            )}
+          </div>
           <Button
             type="submit"
-            colorScheme="blue"
-            alignSelf="flex-start"
-            leftIcon={<AddIcon boxSize={3} />}
-            isLoading={isPending}
+            className="inline-flex items-center gap-2"
+            disabled={isPending}
           >
+            <Plus className="h-4 w-4" />
             Add artifact
           </Button>
-        </Stack>
+        </form>
       )}
       {!canEdit && (
-        <Alert status="warning" variant="subtle">
-          <AlertIcon />
-          Artifacts can only be modified while the estimate is in the Artifacts
-          stage.
+        <Alert variant="warning">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            Artifacts can only be modified while the estimate is in the Artifacts stage.
+          </AlertDescription>
         </Alert>
       )}
-    </Stack>
+    </div>
   );
 }
 
@@ -679,58 +668,57 @@ function NarrativeStageForm({
   };
 
   return (
-    <Stack spacing={4}>
+    <div className="flex flex-col gap-4">
       {record?.approved && (
-        <Alert status="success" variant="subtle">
-          <AlertIcon />
-          Approved content
+        <Alert variant="success">
+          <CheckCircle2 className="h-4 w-4" />
+          <AlertDescription>Approved content</AlertDescription>
         </Alert>
       )}
       {!canEdit && (
-        <Alert status="warning" variant="subtle">
-          <AlertIcon />
-          This stage is not currently active. Content is read-only.
+        <Alert variant="warning">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            This stage is not currently active. Content is read-only.
+          </AlertDescription>
         </Alert>
       )}
-      <Field.Root invalid={Boolean(errors.content)}>
-        <Field.Label>Content</Field.Label>
+      <div className="space-y-1">
+        <label className="text-sm font-medium">Content</label>
         <Textarea
           rows={10}
           {...register("content")}
-          isReadOnly={!canEdit}
+          readOnly={!canEdit}
           placeholder="Capture the narrative for this stage..."
+          className={!canEdit ? "bg-muted/30" : undefined}
         />
-        <Field.ErrorText>{errors.content?.message}</Field.ErrorText>
-      </Field.Root>
+        {errors.content && (
+          <p className="text-sm text-destructive">{errors.content.message}</p>
+        )}
+      </div>
       {canEdit && (
-        <HStack spacing={3}>
+        <div className="flex flex-wrap gap-3">
           <Button
-            colorScheme="gray"
+            variant="outline"
             onClick={handleSubmit((values) => onSave(values, false))}
-            isLoading={isPending}
-            isDisabled={!isDirty && !record?.content}
+            disabled={isPending || (!isDirty && !record?.content)}
           >
-            Save draft
+            {isPending ? "Saving..." : "Save draft"}
           </Button>
-          <Tooltip
-            label={
+          <Button
+            onClick={handleSubmit((values) => onSave(values, true))}
+            disabled={isPending || !nextStage}
+            title={
               nextStage
                 ? `Approve this stage and move to ${formatEstimateStageLabel(nextStage)}.`
                 : "This is the final stage."
             }
           >
-            <Button
-              colorScheme="blue"
-              onClick={handleSubmit((values) => onSave(values, true))}
-              isLoading={isPending}
-              isDisabled={!nextStage}
-            >
-              Approve & advance
-            </Button>
-          </Tooltip>
-        </HStack>
+            {isPending ? "Working..." : "Approve & advance"}
+          </Button>
+        </div>
       )}
-    </Stack>
+    </div>
   );
 }
 
@@ -799,107 +787,99 @@ function WbsEditor({
   };
 
   return (
-    <Stack spacing={4}>
-      <Box overflowX="auto">
-        <Stack
-          as="form"
-          spacing={4}
-          onSubmit={handleSubmit(onSubmit)}
-          noValidate
-        >
-          <Stack spacing={3}>
-            {fields.map((field, index) => (
-              <Grid
-                key={field.id}
-                templateColumns={{ base: "1fr", md: "2fr 1fr 1fr auto" }}
-                gap={3}
-                alignItems="center"
-                borderWidth="1px"
-                borderRadius="md"
-                p={3}
-              >
-                <Field.Root invalid={Boolean(errors.items?.[index]?.task)}>
-                  <Field.Label>Task</Field.Label>
-                  <Input
-                    {...register(`items.${index}.task` as const)}
-                    placeholder="Describe the work"
-                    isDisabled={!canEdit}
-                  />
-                  <Field.ErrorText>
-                    {errors.items?.[index]?.task?.message}
-                  </Field.ErrorText>
-                </Field.Root>
-                <Field.Root invalid={Boolean(errors.items?.[index]?.role)}>
-                  <Field.Label>Role</Field.Label>
-                  <Input
-                    {...register(`items.${index}.role` as const)}
-                    placeholder="Role"
-                    isDisabled={!canEdit}
-                  />
-                  <Field.ErrorText>
-                    {errors.items?.[index]?.role?.message}
-                  </Field.ErrorText>
-                </Field.Root>
-                <Field.Root invalid={Boolean(errors.items?.[index]?.hours)}>
-                  <Field.Label>Hours</Field.Label>
-                  <Input
-                    type="number"
-                    step="0.5"
-                    {...register(`items.${index}.hours` as const, {
-                      valueAsNumber: true,
-                    })}
-                    isDisabled={!canEdit}
-                  />
-                  <Field.ErrorText>
-                    {errors.items?.[index]?.hours?.message}
-                  </Field.ErrorText>
-                </Field.Root>
-                {canEdit && (
-                  <IconButton
-                    aria-label="Remove row"
-                    icon={<DeleteIcon />}
-                    size="sm"
-                    variant="ghost"
-                    colorScheme="red"
-                    onClick={() => remove(index)}
-                  />
-                )}
-              </Grid>
-            ))}
-          </Stack>
-          {canEdit && (
-            <Button
-              variant="ghost"
-              leftIcon={<AddIcon boxSize={3} />}
-              onClick={() =>
-                append({ task: "", role: "", hours: 0, id: undefined })
-              }
+    <div className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)} noValidate>
+        <div className="flex flex-col gap-3">
+          {fields.map((field, index) => (
+            <div
+              key={field.id}
+              className="grid gap-3 rounded-lg border bg-card p-4 shadow-sm md:grid-cols-[2fr_1fr_1fr_auto]"
             >
+              <div className="space-y-1">
+                <label className="text-sm font-medium">Task</label>
+                <Input
+                  {...register(`items.${index}.task` as const)}
+                  placeholder="Describe the work"
+                  disabled={!canEdit}
+                />
+                {errors.items?.[index]?.task && (
+                  <p className="text-sm text-destructive">
+                    {errors.items?.[index]?.task?.message}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium">Role</label>
+                <Input
+                  {...register(`items.${index}.role` as const)}
+                  placeholder="Role"
+                  disabled={!canEdit}
+                />
+                {errors.items?.[index]?.role && (
+                  <p className="text-sm text-destructive">
+                    {errors.items?.[index]?.role?.message}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium">Hours</label>
+                <Input
+                  type="number"
+                  step="0.5"
+                  {...register(`items.${index}.hours` as const, {
+                    valueAsNumber: true,
+                  })}
+                  disabled={!canEdit}
+                />
+                {errors.items?.[index]?.hours && (
+                  <p className="text-sm text-destructive">
+                    {errors.items?.[index]?.hours?.message}
+                  </p>
+                )}
+              </div>
+              {canEdit && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-destructive"
+                  onClick={() => remove(index)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          ))}
+        </div>
+        {canEdit && (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Button
+              type="button"
+              variant="ghost"
+              className="inline-flex items-center gap-2"
+              onClick={() => append({ task: "", role: "", hours: 0, id: undefined })}
+            >
+              <Plus className="h-4 w-4" />
               Add row
             </Button>
-          )}
-          <HStack justify="space-between">
-            <Text fontWeight="semibold">Total hours: {totalHours || 0}</Text>
-            {canEdit && (
-              <Button
-                type="submit"
-                colorScheme="blue"
-                isLoading={isPending}
-                isDisabled={!canEdit}
-              >
-                Save WBS
-              </Button>
-            )}
-          </HStack>
-        </Stack>
-      </Box>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Saving..." : "Save WBS"}
+            </Button>
+          </div>
+        )}
+        <p className="text-sm font-semibold">
+          Total hours: <span className="font-normal">{totalHours || 0}</span>
+        </p>
+      </form>
       {!canEdit && (
-        <Alert status="info" variant="subtle">
-          <AlertIcon />
-          WBS edits are locked until the Effort stage is active.
+        <Alert variant="info">
+          <Info className="h-4 w-4" />
+          <AlertDescription>
+            WBS edits are locked until the Effort stage is active.
+          </AlertDescription>
         </Alert>
       )}
-    </Stack>
+    </div>
   );
 }
 
@@ -979,64 +959,80 @@ function QuoteForm({
   };
 
   return (
-    <Stack spacing={4}>
+    <div className="flex flex-col gap-4">
       {!canEdit && (
-        <Alert status="warning" variant="subtle">
-          <AlertIcon />
-          Quote details are read-only until the quote stage is active.
+        <Alert variant="warning">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            Quote details are read-only until the quote stage is active.
+          </AlertDescription>
         </Alert>
       )}
-      <Field.Root invalid={Boolean(errors.paymentTerms)}>
-        <Field.Label>Payment terms</Field.Label>
+      <div className="space-y-1">
+        <label className="text-sm font-medium">Payment terms</label>
         <Textarea
           rows={4}
           {...register("paymentTerms")}
-          isReadOnly={!canEdit}
+          readOnly={!canEdit}
+          className={!canEdit ? "bg-muted/30" : undefined}
         />
-        <Field.ErrorText>{errors.paymentTerms?.message}</Field.ErrorText>
-      </Field.Root>
-      <Field.Root invalid={Boolean(errors.timeline)}>
-        <Field.Label>Timeline</Field.Label>
-        <Textarea rows={4} {...register("timeline")} isReadOnly={!canEdit} />
-        <Field.ErrorText>{errors.timeline?.message}</Field.ErrorText>
-      </Field.Root>
-      <Field.Root invalid={Boolean(errors.total)}>
-        <Field.Label>Total (USD)</Field.Label>
+        {errors.paymentTerms && (
+          <p className="text-sm text-destructive">{errors.paymentTerms.message}</p>
+        )}
+      </div>
+      <div className="space-y-1">
+        <label className="text-sm font-medium">Timeline</label>
+        <Textarea
+          rows={4}
+          {...register("timeline")}
+          readOnly={!canEdit}
+          className={!canEdit ? "bg-muted/30" : undefined}
+        />
+        {errors.timeline && (
+          <p className="text-sm text-destructive">{errors.timeline.message}</p>
+        )}
+      </div>
+      <div className="space-y-1">
+        <label className="text-sm font-medium">Total (USD)</label>
         <Input
           type="number"
           step="500"
           {...register("total", { valueAsNumber: true })}
-          isReadOnly={!canEdit}
+          readOnly={!canEdit}
         />
-        <Field.ErrorText>{errors.total?.message}</Field.ErrorText>
-      </Field.Root>
-      <Field.Root display="flex" alignItems="center">
-        <Checkbox {...register("delivered")} isDisabled={!canEdit}>
-          Quote delivered to client
-        </Checkbox>
-      </Field.Root>
+        {errors.total && (
+          <p className="text-sm text-destructive">{errors.total.message}</p>
+        )}
+      </div>
+      <label className="flex items-center gap-2 text-sm font-medium">
+        <input
+          type="checkbox"
+          className="h-4 w-4 rounded border border-input bg-background"
+          {...register("delivered")}
+          disabled={!canEdit}
+        />
+        Quote delivered to client
+      </label>
       {canEdit && (
-        <HStack spacing={3}>
+        <div className="flex flex-wrap gap-3">
           <Button
-            colorScheme="gray"
+            variant="outline"
             onClick={handleSubmit((values) => persistQuote(values))}
-            isLoading={isPending}
+            disabled={isPending}
           >
-            Save details
+            {isPending ? "Saving..." : "Save details"}
           </Button>
           <Button
-            colorScheme="blue"
             onClick={handleSubmit((values) =>
               persistQuote({ ...values, delivered: true }, true),
             )}
-            isLoading={isPending}
-            isDisabled={!nextStage}
+            disabled={isPending || !nextStage}
           >
-            Mark delivered & advance
+            {isPending ? "Working..." : "Mark delivered & advance"}
           </Button>
-        </HStack>
+        </div>
       )}
-    </Stack>
+    </div>
   );
 }
 
@@ -1046,29 +1042,27 @@ function StageTimeline({
   transitions: SerializableStageTransition[];
 }) {
   return (
-    <Card>
+    <Card className="shadow-sm">
       <CardHeader>
-        <Heading size="md">Stage timeline</Heading>
+        <CardTitle className="text-lg">Stage timeline</CardTitle>
       </CardHeader>
-      <CardBody>
-        <Stack spacing={4}>
-          {transitions.length === 0 && (
-            <Text color="gray.500">
-              This project has not advanced to the next stage yet.
-            </Text>
-          )}
-          {transitions.map((transition) => (
-            <Box key={transition.id} borderLeftWidth="2px" pl={4} py={2}>
-              <Text fontWeight="semibold">
-                {formatEstimateStageLabel(transition.from)} →{" "}
-                {formatEstimateStageLabel(transition.to)}
-              </Text>
-              <Text fontSize="sm" color="gray.500">
-                {dateTimeFormat.format(new Date(transition.timestamp))}
-              </Text>
-            </Box>
-          ))}
-        </Stack>
+      <CardBody className="space-y-4">
+        {transitions.length === 0 && (
+          <p className="text-sm text-muted-foreground">
+            This project has not advanced to the next stage yet.
+          </p>
+        )}
+        {transitions.map((transition) => (
+          <div key={transition.id} className="border-l-2 border-border pl-4">
+            <p className="font-semibold">
+              {formatEstimateStageLabel(transition.from)} →{" "}
+              {formatEstimateStageLabel(transition.to)}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {dateTimeFormat.format(new Date(transition.timestamp))}
+            </p>
+          </div>
+        ))}
       </CardBody>
     </Card>
   );

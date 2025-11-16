@@ -1,49 +1,33 @@
 "use client";
 
-import {
-  HStack,
-  Stack,
-  ToastCloseTrigger,
-  ToastDescription,
-  ToastIndicator,
-  ToastRoot,
-  ToastTitle,
-  Toaster,
-  createToaster,
-} from "@chakra-ui/react";
+import { Toaster as SonnerToaster, toast } from "sonner";
 
-export const appToaster = createToaster({
-  placement: "top-end",
-  gap: 16,
-});
+type ToastPayload = {
+  title: string;
+  description?: string;
+};
+
+export const appToaster = {
+  success({ title, description }: ToastPayload) {
+    toast.success(title, { description });
+  },
+  error({ title, description }: ToastPayload) {
+    toast.error(title, { description });
+  },
+};
 
 export function AppToaster() {
   return (
-    <Toaster toaster={appToaster} gap="4" zIndex="toast">
-      {(toast) => (
-        <ToastRoot
-          type={toast.type}
-          borderRadius="lg"
-          boxShadow="lg"
-          bg="white"
-          color="gray.900"
-          px={4}
-          py={3}
-          minW={{ base: "auto", sm: "320px" }}
-        >
-          <HStack align="flex-start" spacing={3}>
-            <ToastIndicator />
-            <Stack spacing={1} flex="1">
-              {toast.title && <ToastTitle>{toast.title}</ToastTitle>}
-              {toast.description && (
-                <ToastDescription>{toast.description}</ToastDescription>
-              )}
-            </Stack>
-            <ToastCloseTrigger />
-          </HStack>
-        </ToastRoot>
-      )}
-    </Toaster>
+    <SonnerToaster
+      richColors
+      position="top-right"
+      toastOptions={{
+        classNames: {
+          toast: "bg-background text-foreground shadow-lg border",
+          description: "text-muted-foreground",
+        },
+      }}
+    />
   );
 }
 

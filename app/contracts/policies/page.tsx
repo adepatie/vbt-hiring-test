@@ -1,16 +1,14 @@
-import { Container, Heading, Stack, Text } from "@chakra-ui/react";
-
 export default function PoliciesPage() {
   return (
-    <Container maxW="5xl" py={{ base: 10, md: 16 }}>
-      <Stack spacing={4}>
-        <Heading size="lg">Policy Rules</Heading>
-        <Text color="gray.600">
-          Placeholder for managing policy rules and example violations that
-          drive contract reviews.
-        </Text>
-      </Stack>
-    </Container>
+    <main className="container max-w-5xl py-10 md:py-16 space-y-4">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-semibold tracking-tight">Policy Rules</h1>
+        <p className="text-muted-foreground">
+          Placeholder for managing policy rules and example violations that drive
+          contract reviews.
+        </p>
+      </div>
+    </main>
   );
 }
 

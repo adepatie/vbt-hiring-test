@@ -1,9 +1,8 @@
 "use client";
 
-import { ChakraProvider } from "@chakra-ui/react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
-import theme from "@/lib/theme";
+import { ThemeProvider } from "@/components/theme-provider";
 import { AppToaster } from "@/lib/ui/toaster";
 
 type ProvidersProps = {
@@ -12,10 +11,10 @@ type ProvidersProps = {
 
 export function Providers({ children }: ProvidersProps) {
   return (
-    <ChakraProvider value={theme}>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       {children}
       <AppToaster />
-    </ChakraProvider>
+    </ThemeProvider>
   );
 }
 
