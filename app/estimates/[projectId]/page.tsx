@@ -1,9 +1,12 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { estimatesService } from "@/lib/services/estimatesService";
+import { isEstimateFlowComplete } from "@/lib/utils/estimates";
+import { ProjectDetailView } from "./project-detail-view";
 import {
-  ProjectDetailView,
   type ProjectDetailClient,
-} from "./project-detail-view";
+  serializeProjectDetail,
+  type RoleOption,
+} from "./project-types";
 
 type EstimateDetailPageProps = {
   params: Promise<{ projectId: string }>;
@@ -21,26 +24,25 @@ export default async function EstimateDetailPage({
     notFound();
   }
 
-  const serializableProject: ProjectDetailClient = {
-    ...project,
-    clientName: project.clientName ?? null,
-    createdAt: project.createdAt.toISOString(),
-    updatedAt: project.updatedAt.toISOString(),
-    artifacts: project.artifacts.map((artifact) => ({
-      ...artifact,
-      createdAt: artifact.createdAt.toISOString(),
-    })),
-    stageTransitions: project.stageTransitions.map((transition) => ({
-      ...transition,
-      timestamp: transition.timestamp.toISOString(),
-    })),
-  };
+  if (!isEstimateFlowComplete(project.stage)) {
+    redirect(`/estimates/${projectId}/flow`);
+  }
+
+  const serializableProject: ProjectDetailClient =
+    serializeProjectDetail(project);
+  const roles = await estimatesService.listRoles();
+  const roleOptions: RoleOption[] = roles.map((role) => ({
+    id: role.id,
+    name: role.name,
+    rate: role.rate,
+  }));
 
   return (
-    <main className="container max-w-6xl py-10 md:py-16">
+    <main className="container py-10 md:py-16">
       <ProjectDetailView
         key={`${serializableProject.id}-${serializableProject.stage}`}
         project={serializableProject}
+        roleOptions={roleOptions}
       />
     </main>
   );

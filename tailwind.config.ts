@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss";
 import animate from "tailwindcss-animate";
+import typography from "@tailwindcss/typography";
 
 const config: Config = {
   darkMode: ["class"],
@@ -13,9 +14,7 @@ const config: Config = {
     container: {
       center: true,
       padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
+      screens: {},
     },
     extend: {
       colors: {
@@ -52,6 +51,10 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar))",
+          foreground: "hsl(var(--sidebar-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -74,9 +77,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [animate],
+  plugins: [animate, typography],
 };
 
 export default config;
-
-

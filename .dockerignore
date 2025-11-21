@@ -1,0 +1,16 @@
+.git
+.gitignore
+.DS_Store
+.env
+node_modules
+.next
+.turbo
+uploads
+coverage
+tests
+*.log
+env
+requirements
+tmp
+*.plan.md
+

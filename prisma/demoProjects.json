@@ -1,0 +1,215 @@
+{
+  "projects": [
+    {
+      "key": "apollo",
+      "name": "Project Apollo - Customer Ordering Portal",
+      "clientName": "Acme Corp",
+      "stage": "QUOTE",
+      "archetypeKey": "webApp",
+      "artifacts": [
+        {
+          "type": "note",
+          "originalName": "Project Apollo - Scope and Objectives.txt",
+          "content": "Project Apollo is a greenfield customer ordering portal for Acme Corp that will replace three loosely coupled legacy systems and a patchwork of spreadsheets that sales teams use today. The new experience must allow internal salespeople, external channel partners, and select strategic customers to browse a highly configurable catalog, compose multi-line quotes, submit purchase orders, and track delivery status in near real time. The portal has to support region-specific price books, discounting rules, tax treatments, and approval workflows, while still feeling like a single, coherent product.\n\nFrom a technology perspective, Apollo is expected to be the reference implementation for how Acme builds modern cloud-native applications going forward. It needs a clean domain model around customers, accounts, orders, and entitlements, as well as clear integration seams into the ERP, CRM, and payments providers. Reliability and observability are first-class concerns, because outages in ordering directly translate into lost revenue. The leadership team views Apollo as both a revenue growth lever and an internal modernization catalyst."
+        },
+        {
+          "type": "transcript",
+          "originalName": "Project Apollo - Discovery Call Transcript.txt",
+          "content": "In the initial discovery call for Project Apollo, the VP of Sales opened by explaining that their current order-entry workflow routinely breaks down at quarter end. Reps are forced to email PDFs and screenshots to an operations queue, where a small group of specialists rekey data into the ERP. This is error prone and creates a terrible experience for channel partners who are trying to hit aggressive quotas. The VP emphasized that the new portal must provide a self-service path for simple deals while still supporting complex approvals for custom pricing and non-standard terms.\n\nThe enterprise architect on the call highlighted that Acme has standardized on Okta for workforce and partner identity, and they want Apollo to use Okta groups and attributes to determine which catalog items, price books, and actions each user can see. Security and compliance stakeholders reminded the group that customer and order data will need to be encrypted at rest, with fine-grained audit logs for every change. Finally, the program manager stressed the importance of incremental delivery: the first release should target a constrained set of SKUs and regions but already feel like a polished, production-grade experience."
+        }
+      ]
+    },
+    {
+      "key": "retail-performance-dashboard",
+      "name": "Retail Performance Insights Dashboard",
+      "clientName": "ShopMart Inc.",
+      "stage": "BUSINESS_CASE",
+      "archetypeKey": "dataPlatform",
+      "artifacts": [
+        {
+          "type": "brief",
+          "originalName": "Retail Performance - Executive Briefing.txt",
+          "content": "ShopMart Inc. operates more than 600 brick-and-mortar stores across multiple regions, but leadership lacks a unified, near real-time view of how those locations are performing. Store managers rely on static weekly spreadsheets that are emailed out by finance, and they maintain their own side calculations to understand which promotions are working. The proposed Retail Performance Insights Dashboard will centralize point-of-sale and e-commerce data into a cloud data warehouse and surface curated views that regional directors can interact with daily.\n\nThe business case for this initiative centers on reducing the latency between an underperforming trend emerging and a corrective action being taken. Today it can take two or three weeks before anyone notices that a particular region is missing plan. With the dashboard, the merchandising team expects to adjust assortment and pricing on a weekly cadence, while operations leaders can spot staffing or shrink issues much earlier. Longer term, ShopMart wants this platform to support experimentation at the store level, enabling A/B tests for new layouts, promotions, and service models."
+        },
+        {
+          "type": "transcript",
+          "originalName": "Retail Performance - Stakeholder Workshop.txt",
+          "content": "During the stakeholder workshop, the VP of Merchandising described how decisions are currently driven by a mix of gut feel and end-of-month reports. She wants a way to quickly slice revenue and margin by category, brand, region, and store format, and to see how those metrics move in response to promotional campaigns. The Director of Operations added that store managers often call his team asking for clarity on performance expectations, because targets are not consistently communicated.\n\nAnalytics stakeholders emphasized that the new dashboard should sit on top of a governed semantic layer, not hard-coded business logic in a BI tool. They want KPI definitions to be curated in one place and reused across multiple dashboards. Several attendees raised concerns about data quality, especially when reconciling online and in-store transactions. As a result, the project charter includes explicit time for data profiling, source-to-target mapping, and automated data quality checks that run every day. Everyone agreed that success will be measured not only by usage metrics but also by how often the insights lead to concrete operational changes."
+        }
+      ]
+    },
+    {
+      "key": "hr-portal-modernization",
+      "name": "Legacy HR Portal Modernization",
+      "clientName": "Global Corp",
+      "stage": "EFFORT",
+      "archetypeKey": "internalTools",
+      "artifacts": [
+        {
+          "type": "note",
+          "originalName": "HR Modernization - Current State Assessment.txt",
+          "content": "Global Corp’s existing HR portal is a ten-year-old Java application that was lightly reskinned a few years ago but still behaves like a mainframe front end. Employees complain that it is slow, difficult to navigate, and effectively unusable on mobile devices. HR business partners maintain their own shadow spreadsheets to track promotion cases, performance-improvement plans, and sensitive employee relations issues because the system does not accommodate their workflows. IT teams acknowledge that making changes to the portal is risky and expensive due to brittle code and a lack of automated tests.\n\nThe modernization initiative proposes to replace the legacy portal with a modular, API-first platform that can support a wide range of HR processes over time. The first release will focus on core self-service features such as viewing pay stubs, updating personal information, and submitting time-off requests, while laying the groundwork for more advanced experiences like internal job marketplaces and talent analytics. A key objective is to decouple business rules from the UI so that HR teams can evolve policies without large engineering projects, and to centralize audit and access controls for compliance purposes."
+        },
+        {
+          "type": "transcript",
+          "originalName": "HR Modernization - Persona Interviews.txt",
+          "content": "In one of the persona interviews, a frontline warehouse worker explained that he only has a few minutes during breaks to check his schedule or submit vacation requests, and the current portal often times out before he can complete a task. A regional HR manager described how she has to maintain separate notes in a locked spreadsheet because the portal does not support attaching sensitive documentation or tracking who has viewed a case. She worries that this ad hoc approach exposes the company to legal risk if records are lost or inconsistent.\n\nDesign and product team members used these stories to highlight the importance of role-based experiences and progressive disclosure of sensitive data. For example, an employee should see a simple, task-driven interface, while HR partners need richer context and tools for collaboration. Security representatives on the call reiterated that any new solution must integrate with existing identity providers, support step-up authentication for high-risk actions, and provide a clear audit trail of who accessed or changed HR records. Everyone agreed that an accessible, mobile-friendly UI is non-negotiable."
+        }
+      ]
+    },
+    {
+      "key": "ecommerce-platform-migration",
+      "name": "E-commerce Platform Migration",
+      "clientName": "FashionForward",
+      "stage": "QUOTE",
+      "archetypeKey": "webApp",
+      "artifacts": [
+        {
+          "type": "brief",
+          "originalName": "E-commerce Migration - Opportunity Summary.txt",
+          "content": "FashionForward is currently running its direct-to-consumer storefront on an aging monolithic platform that makes it difficult to roll out new features, experiment with merchandising strategies, or handle traffic spikes during major campaigns. The engineering team spends a disproportionate amount of time firefighting performance and stability issues instead of delivering improvements that would move the needle on conversion and average order value. Marketing has been vocal about the platform’s limitations around personalization and content management, which slow them down during key seasonal launches.\n\nThe migration project aims to move FashionForward onto a composable, cloud-native commerce stack built around a headless storefront, scalable APIs, and a modern content management system. This opens the door for richer product-detail experiences, dynamic recommendations, and localized content that can be controlled by merchandisers without code changes. The business case points to both cost avoidance—by retiring expensive legacy infrastructure—and incremental revenue through better experiences and faster experimentation. A phased rollout plan will start with a specific geography and product category before expanding to the full catalog."
+        },
+        {
+          "type": "transcript",
+          "originalName": "E-commerce Migration - Technical Deep Dive.txt",
+          "content": "In the technical deep dive session, FashionForward’s lead architect walked through the current production topology, highlighting multiple single points of failure and brittle integrations to payment processors and fraud services. Deployments are manual, relying on a series of runbooks that differ slightly between environments, which has led to embarrassing production incidents when configuration changes are missed. The team would like to adopt a GitOps-style deployment model with infrastructure as code, automated rollbacks, and blue-green or canary releases.\n\nSecurity and compliance representatives raised concerns about how customer data is currently replicated across several downstream systems without clear ownership or data minimization strategies. They view the migration as an opportunity to rationalize data flows, centralize logging, and enforce consistent encryption and tokenization standards. Everyone agreed that performance budgets should be defined up front, with load testing integrated early into the project. The group also discussed the importance of strong observability—traces, metrics, and logs that can pinpoint whether issues are in the frontend, APIs, or third-party services."
+        }
+      ]
+    },
+    {
+      "key": "mobile-loyalty-app",
+      "name": "Mobile Loyalty App",
+      "clientName": "CoffeeChain",
+      "stage": "QUOTE",
+      "archetypeKey": "mobileApp",
+      "artifacts": [
+        {
+          "type": "note",
+          "originalName": "Loyalty App - Product Vision.txt",
+          "content": "CoffeeChain’s leadership wants to deepen customer engagement beyond simple punch-card style rewards by launching a mobile loyalty app that feels like a digital extension of the in-store experience. The vision includes personalized offers based on visit history, the ability to order ahead and skip the line, and a mechanism for customers to discover new products and seasonal beverages in a playful way. The app should integrate tightly with the existing point-of-sale system so baristas see the same orders and preferences that customers do.\n\nThe product team believes that a well-designed loyalty app will not only increase visit frequency but also provide valuable data on customer preferences and behavior. This data can inform store staffing levels, menu decisions, and marketing campaigns. To achieve this, the platform must be able to track events at a fine-grained level—such as when a user browses but does not purchase a particular drink—and feed those signals into CoffeeChain’s analytics systems. The app will need to work reliably on both iOS and Android, with offline-friendly patterns for core flows like redeeming rewards at locations with spotty connectivity."
+        },
+        {
+          "type": "transcript",
+          "originalName": "Loyalty App - Customer Interviews.txt",
+          "content": "In a series of customer interviews, frequent CoffeeChain visitors explained that they often abandon mobile ordering because current experiences at competitor chains feel cluttered and confusing. They want an app that makes it trivial to reorder their usual drink, customize it slightly, and see exactly when it will be ready. Several interviewees mentioned that they enjoy experiments and seasonal drinks but often learn about them too late because information is only posted on in-store signage.\n\nFrom an accessibility standpoint, participants stressed that small tap targets and low-contrast color schemes make many existing apps difficult to use on the go. The design team committed to treating accessibility as a core requirement rather than an afterthought. Operations stakeholders also requested features such as store-status indicators and throttling mechanisms to prevent mobile orders from overwhelming understaffed locations. The overarching theme of the interviews was that the app must respect the customer’s time while still conveying the warmth and personality of the brand."
+        }
+      ]
+    },
+    {
+      "key": "field-service-platform",
+      "name": "Field Service Technician Platform",
+      "clientName": "GridServ Utilities",
+      "stage": "SOLUTION",
+      "archetypeKey": "mobileApp",
+      "artifacts": [
+        {
+          "type": "brief",
+          "originalName": "Field Service - Problem Statement.txt",
+          "content": "GridServ Utilities employs hundreds of field technicians who perform maintenance and emergency repairs on electrical infrastructure, yet their core tools are still clipboards and disconnected mobile apps that do not synchronize reliably. Dispatchers struggle to see who is working on what, and technicians often arrive on site without complete information about assets, hazards, or customer history. Paper-based workflows introduce delays and errors when updating asset records or closing out work orders.\n\nThe envisioned Field Service Technician Platform will provide a unified mobile experience for technicians and a real-time command center for dispatchers. Technicians will see their daily routes, job details, asset diagrams, and safety procedures in one place, even when they are temporarily offline. They will be able to capture photos, notes, readings, and parts used on site, which then flow automatically into GridServ’s asset management and billing systems. The goal is to reduce truck rolls, improve first-time fix rates, and create a more accurate picture of infrastructure health."
+        },
+        {
+          "type": "transcript",
+          "originalName": "Field Service - Ride Along Notes.txt",
+          "content": "During a ride along with a senior technician, the project team observed how frequently he had to call the dispatcher to confirm details that were missing or outdated in his work order. The technician explained that he often carries a folder of printed schematics because the current mobile app times out and loses context when switching between screens. He also expressed frustration that there is no simple way to capture ad hoc observations about nearby equipment that may need attention soon but is not yet in the work queue.\n\nDispatch supervisors interviewed later in the day said they frequently operate in crisis mode during storms or heat waves, juggling dozens of priorities without a reliable system for ranking critical incidents. They want the new platform to surface risk scores and service-level objectives so that they can allocate technicians more intelligently. Safety officers on the call highlighted the need for just-in-time prompts about lockout/tagout procedures, personal protective equipment, and known hazards at specific sites. These insights are shaping the requirements for contextual guidance and offline-first design."
+        }
+      ]
+    },
+    {
+      "key": "payments-orchestration-layer",
+      "name": "Global Payments Orchestration Layer",
+      "clientName": "NovaPay",
+      "stage": "REQUIREMENTS",
+      "archetypeKey": "dataPlatform",
+      "artifacts": [
+        {
+          "type": "note",
+          "originalName": "Payments Orchestration - Strategy Memo.txt",
+          "content": "NovaPay operates in dozens of markets with a patchwork of regional payment processors, fraud providers, and settlement systems, many of which were added opportunistically as the company grew. This has resulted in duplicated integration work, inconsistent routing logic, and limited visibility into global payment performance. The proposed Global Payments Orchestration Layer will abstract away individual processors behind a unified API and policy engine capable of routing each transaction to the optimal path based on geography, card type, risk profile, and real-time cost and performance metrics.\n\nFrom a business standpoint, the orchestration layer is expected to reduce authorization declines, lower processing costs, and open up new markets more quickly by reusing integrations. It also provides a foundation for advanced capabilities such as cascading retries, smart routing during outages, and A/B testing of fraud strategies. The memo emphasizes that this is not just an engineering project but a cross-functional initiative involving risk, compliance, finance, and customer support. Success metrics include uplift in approval rates, reduction in false positives for fraud, and faster time-to-market for new payment methods."
+        },
+        {
+          "type": "transcript",
+          "originalName": "Payments Orchestration - Architecture Review.txt",
+          "content": "In the architecture review, engineers debated how to balance latency and resilience when adding an orchestration hop in front of existing processors. One proposal favored a stateless routing service that consults a configuration store and emits events to an analytics pipeline, while another advocated for a more stateful system that could track transaction lifecycles more explicitly. Observability specialists stressed the importance of having structured events for each decision point so that teams can later reconstruct what happened when a transaction behaves unexpectedly.\n\nRisk and compliance officers asked detailed questions about how the new layer would handle data residency requirements, especially when transactions originate in jurisdictions with strict privacy laws. They want guarantees that personally identifiable information is minimized and tokenized before being sent to third parties whenever possible. Representatives from the finance team expressed excitement about the possibility of dynamically steering traffic toward lower-cost providers during periods of high volume, provided that the system can ensure a consistent customer experience. The meeting concluded with agreement on a phased rollout and a proof-of-concept focusing on a single region."
+        }
+      ]
+    },
+    {
+      "key": "data-governance-portal",
+      "name": "Enterprise Data Governance Portal",
+      "clientName": "HelioBank",
+      "stage": "BUSINESS_CASE",
+      "archetypeKey": "internalTools",
+      "artifacts": [
+        {
+          "type": "brief",
+          "originalName": "Data Governance - Problem Overview.txt",
+          "content": "HelioBank’s data governance practices are currently fragmented across multiple committees, SharePoint sites, and ad hoc email threads. Business users often do not know whom to contact when they have questions about the meaning or quality of particular data elements, and data stewards struggle to communicate policy changes consistently. Regulators have repeatedly asked for clearer documentation of lineage, ownership, and access controls for critical data sets, and internal audit has identified gaps in how exceptions are tracked and approved.\n\nThe Enterprise Data Governance Portal is envisioned as a central place where stakeholders can discover data assets, understand definitions and lineage, and initiate governance workflows. It will integrate with HelioBank’s existing catalog and metadata tooling but provide a more approachable interface for non-technical users. Policy owners will be able to publish standards and guides, while data stewards can manage approvals for schema changes, new data usages, and exception handling. Over time, the portal should become the authoritative system of record for who is responsible for each domain and how data is meant to be used."
+        },
+        {
+          "type": "transcript",
+          "originalName": "Data Governance - Steering Committee Minutes.txt",
+          "content": "During the data governance steering committee meeting, the Chief Data Officer expressed frustration that important decisions are buried in slide decks and meeting notes that are not easily searchable. She wants a system where each decision about data policy is captured in a structured way, linked to the specific assets and teams involved. Representatives from risk and compliance teams agreed, noting that they often have to reconstruct the rationale for decisions months later during regulatory exams.\n\nIT platform owners voiced concerns about yet another tool being introduced but were reassured that the portal would sit on top of existing investments rather than replace them. The group discussed how to incentivize adoption by embedding governance workflows into existing processes, such as change management and project intake. Human resources suggested that training and recognition programs be tied to active participation in data stewardship. The consensus was that successful rollout would require equal attention to culture, process, and technology."
+        }
+      ]
+    },
+    {
+      "key": "customer-support-workbench",
+      "name": "Customer Support Workbench",
+      "clientName": "SkyLink Telecom",
+      "stage": "SOLUTION",
+      "archetypeKey": "internalTools",
+      "artifacts": [
+        {
+          "type": "note",
+          "originalName": "Support Workbench - Agent Pain Points.txt",
+          "content": "SkyLink’s customer support agents currently juggle six different tools during a typical call: a CRM system for account details, a knowledge base for troubleshooting steps, a ticketing tool for escalations, several internal dashboards for network status, and a legacy billing system. This context-switching not only slows agents down but also makes it difficult to train new hires. Customers frequently complain that they have to repeat information when they are transferred between teams because data does not move cleanly from one system to another.\n\nThe Customer Support Workbench initiative will consolidate the most common agent workflows into a single, task-oriented interface. Agents will be able to authenticate customers, view contextual information about recent activity and open issues, run guided diagnostics, and trigger standardized remediation actions without leaving the workbench. Integrations with knowledge management tools will surface relevant articles in real time based on call context. The overarching goal is to reduce average handle time, improve first-contact resolution, and create a better experience for both customers and agents."
+        },
+        {
+          "type": "transcript",
+          "originalName": "Support Workbench - Call Listening Session.txt",
+          "content": "During a call listening session, the team observed an experienced agent handle a customer who was experiencing intermittent connectivity issues. The agent had to navigate across multiple browser tabs and copy data manually between systems while trying to keep the conversation flowing naturally. At one point, she apologized to the customer for the delay, explaining that the tools were slow to respond. After the call, she noted that much of her mental energy was spent managing the tools rather than focusing on the customer’s tone and cues.\n\nSupervisors participating in the session said they would like better visibility into how agents move through workflows so they can identify coaching opportunities and process bottlenecks. They also requested mechanisms for quickly updating scripts and troubleshooting steps in response to new issues, such as outages or product launches. The discussion highlighted the potential of the workbench to provide not just a unified UI but also a feedback loop that continuously improves support processes."
+        }
+      ]
+    },
+    {
+      "key": "portfolio-analytics-suite",
+      "name": "Institutional Portfolio Analytics Suite",
+      "clientName": "NorthBridge Asset Management",
+      "stage": "EFFORT",
+      "archetypeKey": "dataPlatform",
+      "artifacts": [
+        {
+          "type": "brief",
+          "originalName": "Portfolio Analytics - Use Case Overview.txt",
+          "content": "NorthBridge manages complex institutional portfolios for pension funds, endowments, and sovereign wealth funds, yet its analytics tooling has not kept pace with the sophistication of its investment strategies. Portfolio managers rely on a mix of desktop tools, vendor systems, and hand-built spreadsheets to evaluate exposures, performance attribution, and scenario analyses. This fragmented landscape makes it harder to respond quickly to market events or client inquiries, and it introduces operational risk when key analysts are unavailable.\n\nThe Institutional Portfolio Analytics Suite will provide a centralized platform for exploring portfolio data across asset classes, strategies, and mandates. It will offer interactive dashboards, flexible slice-and-dice capabilities, and a library of reusable analytics modules that quants and technologists can extend. The initiative is intended to strengthen NorthBridge’s value proposition to clients by demonstrating deeper insight into risk and performance drivers, while also improving internal efficiency. The suite will draw from multiple upstream systems but present a unified, governed view of the truth."
+        },
+        {
+          "type": "transcript",
+          "originalName": "Portfolio Analytics - PM Roundtable.txt",
+          "content": "In a roundtable discussion, several portfolio managers shared stories of scrambling during market dislocations to understand their exposures to specific sectors, issuers, or risk factors. They described scenarios where each desk ran its own analysis with slightly different assumptions, leading to confusion about which numbers to trust. One manager explained that he often keeps his own offline model because he cannot express certain views in the current vendor tools.\n\nRisk and technology stakeholders at the table advocated for a more modular architecture where analytics building blocks—such as factor models, stress scenarios, and attribution algorithms—are implemented once and then reused across interfaces. They also emphasized the importance of performance and scalability, given the size and complexity of some portfolios. The group agreed that while the initial focus should be on supporting equity and fixed-income strategies, the design must accommodate alternatives and derivatives over time. These insights are informing the backlog of analytics features and data requirements."
+        }
+      ]
+    },
+    {
+      "key": "manufacturing-iot-platform",
+      "name": "Manufacturing IoT Monitoring Platform",
+      "clientName": "PrecisionFab Industries",
+      "stage": "ARTIFACTS",
+      "archetypeKey": "dataPlatform",
+      "artifacts": [
+        {
+          "type": "note",
+          "originalName": "IoT Platform - Plant Walkthrough Notes.txt",
+          "content": "PrecisionFab operates several factories that produce highly specialized components for aerospace customers, and downtime on critical machines can have outsized financial and reputational impacts. Today, plant managers rely on a combination of built-in machine dashboards, local historians, and radio calls from operators to piece together a picture of what is happening on the floor. There is no single, normalized view of machine health, production throughput, or environmental conditions across sites.\n\nThe Manufacturing IoT Monitoring Platform will ingest telemetry from sensors and controllers into a unified data plane, where it can be used for real-time alerting, historical analysis, and eventually predictive maintenance models. The goal is not only to detect faults faster but also to understand patterns that precede failures so that maintenance can be scheduled proactively. The project also aims to improve communication between operations, engineering, and quality teams by providing shared dashboards and drill-down capabilities. Security and safety considerations are paramount, given the mix of legacy industrial protocols and modern cloud services."
+        },
+        {
+          "type": "transcript",
+          "originalName": "IoT Platform - Operator Interviews.txt",
+          "content": "During interviews with machine operators, the team heard repeated frustration about alarm fatigue. Many current systems emit a constant stream of low-priority alerts that are either ignored or disabled, increasing the risk that critical alarms will also be missed. Operators expressed interest in a system that better distinguishes between informational, warning, and critical conditions, and that aggregates related events into a single incident view. They also want a simple way to annotate incidents with the steps they took, so that future shifts can learn from past experience.\n\nIT and OT security teams joined later conversations to discuss network segmentation, identity and access management, and secure remote access for vendors. They emphasized that any new monitoring platform must respect existing safety controls and not introduce new failure modes. The group also debated how to stage the rollout across plants, starting with a limited subset of machines to prove value before expanding. These discussions are shaping requirements around scalability, multi-tenancy, and configuration management."
+        }
+      ]
+    }
+  ]
+}
+
+

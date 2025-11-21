@@ -11,7 +11,10 @@ import {
   projectSchema,
   type EstimateStage,
 } from "@/lib/zod/estimates";
-import { formatEstimateStageLabel } from "@/lib/utils/estimates";
+import {
+  formatEstimateStageLabel,
+  isEstimateFlowComplete,
+} from "@/lib/utils/estimates";
 import { appToaster } from "@/lib/ui/toaster";
 import { createProjectAction } from "./actions";
 import { Button } from "@/components/ui/button";
@@ -50,7 +53,8 @@ const createProjectFormSchema = z.object({
     .refine((value) => value.length <= 160, "Client name is too long."),
 });
 
-type CreateProjectFormValues = z.infer<typeof createProjectFormSchema>;
+type CreateProjectFormValues = z.input<typeof createProjectFormSchema>;
+type CreateProjectFormOutput = z.output<typeof createProjectFormSchema>;
 
 export type ProjectListProject = {
   id: string;
@@ -71,7 +75,6 @@ const stageBadgeClass: Record<EstimateStage, string> = {
   SOLUTION: "bg-teal-100 text-teal-700",
   EFFORT: "bg-amber-100 text-amber-800",
   QUOTE: "bg-orange-100 text-orange-800",
-  DELIVERED: "bg-emerald-100 text-emerald-800",
 };
 
 const dateFormatter = new Intl.DateTimeFormat("en", {
@@ -98,7 +101,7 @@ export function ProjectList({ projects }: ProjectListProps) {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<CreateProjectFormValues>({
+  } = useForm<CreateProjectFormValues, unknown, CreateProjectFormOutput>({
     resolver: zodResolver(createProjectFormSchema),
     defaultValues: {
       name: "",
@@ -122,7 +125,7 @@ export function ProjectList({ projects }: ProjectListProps) {
     });
   }, [projects, search, stageFilter]);
 
-  const onSubmit = (values: CreateProjectFormValues) => {
+  const onSubmit = (values: CreateProjectFormOutput) => {
     startTransition(async () => {
       try {
         const payload = {
@@ -135,7 +138,7 @@ export function ProjectList({ projects }: ProjectListProps) {
           description: `Redirecting to ${project.name}...`,
         });
         reset();
-        router.push(`/estimates/${project.id}`);
+        router.push(`/estimates/${project.id}/flow`);
       } catch (error) {
         console.error(error);
         toast.error({
@@ -240,7 +243,11 @@ export function ProjectList({ projects }: ProjectListProps) {
                     <TableRow key={project.id}>
                       <TableCell>
                         <Link
-                          href={`/estimates/${project.id}`}
+                          href={
+                            isEstimateFlowComplete(project.stage)
+                              ? `/estimates/${project.id}`
+                              : `/estimates/${project.id}/flow`
+                          }
                           className="font-semibold text-primary hover:underline"
                         >
                           {project.name}

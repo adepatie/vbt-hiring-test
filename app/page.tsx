@@ -10,23 +10,44 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { estimatesService } from "@/lib/services/estimatesService";
+import { contractsService } from "@/lib/services/contractsService";
 
-const workflows = [
-  {
-    title: "Estimates",
-    description:
-      "Track the six-stage estimate workflow, WBS progress, and approvals.",
-    href: "/estimates",
-  },
-  {
-    title: "Contracts",
-    description:
-      "Manage policy rules, agreement versions, and client review proposals.",
-    href: "/contracts",
-  },
-];
+const countFormatter = new Intl.NumberFormat("en-US");
+const timestampFormatter = new Intl.DateTimeFormat("en", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
 
-export default function Home() {
+const formatCount = (value: number) => countFormatter.format(value);
+const formatLastUpdated = (value: Date | null) =>
+  value ? timestampFormatter.format(value) : "--";
+
+export default async function Home() {
+  const [estimateStats, contractStats] = await Promise.all([
+    estimatesService.getDashboardStats(),
+    contractsService.getDashboardStats(),
+  ]);
+
+  const workflows = [
+    {
+      title: "Estimates",
+      description:
+        "Track the six-stage estimate workflow, WBS progress, and approvals.",
+      href: "/estimates",
+      count: estimateStats.count,
+      lastUpdated: estimateStats.lastUpdated,
+    },
+    {
+      title: "Contracts",
+      description:
+        "Manage policy rules, agreement versions, and client review proposals.",
+      href: "/contracts",
+      count: contractStats.count,
+      lastUpdated: contractStats.lastUpdated,
+    },
+  ];
+
   return (
     <main className="container max-w-5xl py-12 md:py-20 space-y-10">
       <div className="space-y-3">
@@ -45,8 +66,8 @@ export default function Home() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="text-sm text-muted-foreground space-y-1">
-                <p>Count: --</p>
-                <p>Last updated: --</p>
+                <p>Count: {formatCount(workflow.count)}</p>
+                <p>Last updated: {formatLastUpdated(workflow.lastUpdated)}</p>
               </div>
               <Link
                 href={workflow.href}

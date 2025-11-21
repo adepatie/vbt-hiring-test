@@ -1,37 +1,55 @@
-# Bootstrap Approach
+## Overview
 
-1. **Scaffold with create-next-app**
-   - Generated a TypeScript App Router project using CLI flags.
-   - Copied the scaffold into the repo root without disturbing `requirements/` or `spec/`.
+This project implements the “Multi‑Workflow System” from the hiring test: a small internal app with an Estimates workflow, a Contracts workflow, and a context‑aware Copilot. I treated the one‑week window as an AI‑assisted delivery exercise: use the models to move fast, but keep a clear architecture, thin vertical slices, and working tests at the core.
 
-2. **Install shared dependencies up front**
-   - Chakra UI, `react-hook-form`, Zod, Prisma, and supporting packages were installed immediately so later iterations can focus on workflow logic.
+I started by turning the PDF + `requirements/test-prompt.txt` into an `ARCHITECTURE.md` that described the workflows, data model, and Copilot shape, then iterated feature‑by‑feature (bootstrapping, estimates flow, artifact uploads, MCP refactor, Copilot UI) using Cursor’s plan → implement → debug loop until the core flows were demoable end‑to‑end.
 
-3. **Wire Chakra + dashboard skeleton**
-   - Added a root `Providers` wrapper, light custom theme, and a dashboard layout that mirrors the Estimates / Contracts cards described in the spec.
+## AI tools I used and why
 
-4. **Placeholder routes + libraries**
-   - Created stub pages for Estimates list/detail, Contracts list/detail, and policy rules.
-   - Added empty service, schema, Copilot, and utils modules to outline the intended layering.
+- **Cursor (chat, “Build”, and plan mode)**  
+  This was my primary environment for code generation and refactors. Plan mode helped keep changes anchored to the spec (e.g., artifact upload, stage refactor, MCP registry) and made it safe to apply multi‑file edits. I also used Cursor’s agent to chase down stack traces and lints when something regressed.
 
-5. **Prisma bootstrap**
-   - Ran `prisma init`, set a local Postgres connection string, imported `dotenv/config`, and added a reusable `lib/db.ts` client.
+- **GPT‑5.1 models (via Cursor and the app’s own MCP client)**  
+  I used GPT‑5.1 both inside Cursor (for general coding) and inside the app itself for Business Case / Requirements / Solution / WBS generation via a typed LLM client and MCP server. The same tool surface is intended to power the future Copilot chat.
 
-6. **Documentation**
-   - Updated `README.md`, `AI_ARTIFACTS.md`, and new `TESTING.md` to explain the skeleton and what comes next.
+- **ChatGPT (pre‑repo architecture prompt)**  
+  Before writing code, I used ChatGPT to help refine the initial architectural planning prompt that appears in `AI_ARTIFACTS.md`, then moved into Cursor once the repo and requirements were in place.
 
-7. **Environment & database setup**
-   - Added `docker-compose.yml` for a Postgres 16 container plus npm scripts (`db:up`, `db:down`, `db:reset`).
-   - Standardized `.env` / `.env.example` and added a DB health endpoint so developers can verify connectivity quickly.
+## Prompt strategy
 
-This keeps the surface area small while making it easy to incrementally fill in the real workflows over the one-week iteration.
+- **Ground everything in the spec first**  
+  I consistently pointed the agent at `requirements/test-prompt.txt` (and the PDF) and asked for clarifying questions before accepting any architecture or large code change, to ensure we were always aligned with the test’s expectations.
 
-Following this I manually tested the app to make sure everything was running as expected.
-There were some issues with the imports so I had the agent run the app again and attempt to fix. After a couple tries it managed to fix the issues.
-Next I want to have the agent setup our postgres instance. One annoying part of using this plan mode is it tries to replace your existing plans constantly. You have to instuct it to start a new plan. I had it revert the document to previous state so I could share it.
+- **Work from small, explicit plans**  
+  For each slice (bootstrap, DB setup, Estimates v1, artifact upload, LLM service, MCP refactor, Copilot chat UI) I requested or refined a dedicated `.plan.md`, then executed it in order instead of asking for a monolithic “build the whole app” response.
 
-Next I had the agent plan and build a basic version of the Estimates workflow that didn't include LLM integration. It resulted in a few errors which I would paste one-by-one into the chat. I tried to get it to browse throught he errors itself but it doesn't seem to consistently do this.
+- **Iterate from concrete failures (tests and errors)**  
+  When changes broke something, I pasted failing tests or runtime errors directly (rather than loosely describing symptoms) and asked Cursor to reason from that evidence. This worked well for things like Prisma schema issues, Next.js layout errors, and Copilot tool gating problems.
 
-I'm seeing that while I enjoy writing apps using ChakraUI, GPT 5.1 Codex High is having a hard time understanding how to use it. Maybe a different more popular UI library would be a better choice for this project.
+- **Constrain and correct the model when it drifted**  
+  If Cursor over‑implemented (e.g., building features not in the plan) or misused a library (Chakra v3 APIs, Radix Select imports), I stopped, summarized what had gone wrong in my own words, and then narrowed the next prompt around the specific misstep.
 
-I decided to switch to shadcn UI based on GPT's recommendation. 
+## Biggest pivots / surprises
+
+- **ChakraUI → shadcn UI**  
+  I bootstrapped the UI with Chakra (as in my original architectural prompt), but GPT‑5.1 Codex repeatedly mixed v2/v3 APIs and theme config, creating brittle fixes. After several rounds of friction I pivoted to shadcn UI + Tailwind, which the model handled much more consistently and which simplified the ChatGPT‑style layout.
+
+- **From direct OpenAI calls to an MCP tool layer**  
+  The first LLM integration was a simple prompt helper for Business Case generation. As soon as I started planning a Copilot chat, that felt too ad‑hoc. I introduced a typed `callLLM` client and then a proper MCP server with a `MCP_TOOLS` registry and Zod‑backed tool schemas (including “read” tools), so both the UI buttons and future chat could safely reuse the same tools.
+
+- **Refactoring to a ChatGPT‑like shell**  
+  Mid‑project I refactored the Estimates experience into a ChatGPT‑style layout (sidebar projects, main stage view, right‑hand timeline, bottom action bar / future Copilot input). Doing this via AI‑assisted refactors across many components was risky but ultimately paid off in a more intuitive demo.
+
+## What I’d do differently with more time
+
+- **Deeper Contracts + cross‑workflow validation**  
+  I’d flesh out the Contracts workflow to more fully match the spec: richer policy management, stronger SOW/MSA generation, and a complete “validate against estimate” path that cross‑checks WBS, quotes, and contract terms.
+
+- **More systematic Copilot testing and observability**  
+  I added tests for key server functions and MCP registry behavior, but with more time I’d add a focused suite around Copilot tools and side effects (especially cross‑workflow ones) and introduce better tracing/metrics for tool calls and token usage.
+
+- **Prompt and performance tuning**  
+  Some long‑running stages (especially Requirements and Solution) could be optimized further by tightening prompts, improving artifact summarization, and refining token limits. Given more time I’d iterate on those to make the Copilot feel snappier without losing fidelity.
+
+- **Developer experience and seeding**  
+  I’d invest in an even smoother dev path: a single `dev:reset` script that runs migrations + seeds, more realistic demo data for both workflows, and a couple of additional AI_ARTIFACTS sections that walk through the MCP refactor and Copilot wiring in more detail.

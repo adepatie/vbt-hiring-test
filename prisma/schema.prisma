@@ -22,16 +22,15 @@ enum EstimateStage {
   SOLUTION
   EFFORT
   QUOTE
-  DELIVERED
 }
 
 model Project {
-  id        String        @id @default(cuid())
-  name      String
+  id         String        @id @default(cuid())
+  name       String
   clientName String?
-  stage     EstimateStage @default(ARTIFACTS)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  stage      EstimateStage @default(ARTIFACTS)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
 
   // Relations
   artifacts    Artifact[]
@@ -41,75 +40,162 @@ model Project {
   wbsItems     WBSItem[]
   quote        Quote?
   stageHistory StageTransition[]
+  agreements   Agreement[]
 }
 
 model Artifact {
-  id        String   @id @default(cuid())
-  projectId String
-  project   Project  @relation(fields: [projectId], references: [id])
-
-  type      String    // keep minimal: "note", "file", "doc", etc.
-  content   String?   // raw text or extracted content
-  url       String?   // for uploaded files
-  createdAt DateTime @default(now())
-}
-
-model BusinessCase {
-  id        String   @id @default(cuid())
-  projectId String   @unique
-  project   Project  @relation(fields: [projectId], references: [id])
-
-  content   String   // merged LLM output + user edits
-  approved  Boolean  @default(false)
-}
-
-model Requirements {
-  id        String   @id @default(cuid())
-  projectId String   @unique
-  project   Project  @relation(fields: [projectId], references: [id])
-
-  content   String
-  approved  Boolean  @default(false)
-}
-
-model SolutionArchitecture {
-  id        String   @id @default(cuid())
-  projectId String   @unique
-  project   Project  @relation(fields: [projectId], references: [id])
-
-  content   String
-  approved  Boolean  @default(false)
-}
-
-model WBSItem {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   projectId String
   project   Project @relation(fields: [projectId], references: [id])
 
-  task      String
-  role      String
-  hours     Float
+  type         String // keep minimal: "note", "file", "doc", etc.
+  content      String? // raw text or extracted content
+  url          String? // for uploaded files
+  originalName String?
+  storedFile   String?
+  mimeType     String?
+  sizeBytes    Int?
+  createdAt    DateTime @default(now())
+}
+
+model BusinessCase {
+  id        String  @id @default(cuid())
+  projectId String  @unique
+  project   Project @relation(fields: [projectId], references: [id])
+
+  content  String // merged LLM output + user edits
+  approved Boolean @default(false)
+}
+
+model Requirements {
+  id        String  @id @default(cuid())
+  projectId String  @unique
+  project   Project @relation(fields: [projectId], references: [id])
+
+  content  String
+  approved Boolean @default(false)
+}
+
+model SolutionArchitecture {
+  id        String  @id @default(cuid())
+  projectId String  @unique
+  project   Project @relation(fields: [projectId], references: [id])
+
+  content  String
+  approved Boolean @default(false)
+}
+
+model WBSItem {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  task     String
+  roleName String @map("role")
+  hours    Float
+  roleId   String?
+  role     Role?   @relation(fields: [roleId], references: [id])
+}
+
+model Role {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  rate      Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  wbsItems WBSItem[]
 }
 
 model Quote {
-  id           String   @id @default(cuid())
-  projectId    String   @unique
-  project      Project  @relation(fields: [projectId], references: [id])
+  id        String  @id @default(cuid())
+  projectId String  @unique
+  project   Project @relation(fields: [projectId], references: [id])
 
-  rates        Json?     // role → rate
+  // NOTE: despite the legacy name "rates", this stores Role Name -> Total Cost
+  // (not the hourly rate). Totals are derived from WBS items at save-time.
+  rates        Json?
   paymentTerms String?
   timeline     String?
 
-  total        Float?
-  delivered    Boolean   @default(false)
+  total       Float?
+  overheadFee Decimal @default(0) @db.Decimal(10, 2)
+  delivered   Boolean @default(false)
 }
 
 model StageTransition {
-  id        String        @id @default(cuid())
+  id        String  @id @default(cuid())
   projectId String
-  project   Project       @relation(fields: [projectId], references: [id])
+  project   Project @relation(fields: [projectId], references: [id])
 
   from      EstimateStage
   to        EstimateStage
-  timestamp DateTime       @default(now())
+  timestamp DateTime      @default(now())
+}
+
+// Contracts Workflow Data Model
+
+enum AgreementStatus {
+  REVIEW
+  APPROVED
+}
+
+enum AgreementType {
+  MSA
+  SOW
+  NDA
+}
+
+model PolicyRule {
+  id          String   @id @default(cuid())
+  description String   // e.g. "Payment terms must be Net 30"
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ExampleAgreement {
+  id        String        @id @default(cuid())
+  name      String
+  type      AgreementType
+  content   String        // The full text of the example
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model Agreement {
+  id           String          @id @default(cuid())
+  type         AgreementType
+  counterparty String
+  status       AgreementStatus @default(APPROVED)
+  
+  projectId    String?
+  project      Project?        @relation(fields: [projectId], references: [id])
+
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  reviewData   Json?           // Stores in-progress review proposals and decisions
+
+  versions     AgreementVersion[]
+}
+
+model AgreementVersion {
+  id          String    @id @default(cuid())
+  agreementId String
+  agreement   Agreement @relation(fields: [agreementId], references: [id])
+  
+  versionNumber Int
+  content       String
+  changeNote    String?   // e.g. "Applied client feedback on IP clause"
+  
+  createdAt     DateTime  @default(now())
+}
+
+model QuoteSettings {
+  id          String   @id @default("singleton")
+  overheadFee Decimal  @db.Decimal(10, 2)
+  updatedBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

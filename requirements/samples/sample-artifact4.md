@@ -1,0 +1,7 @@
+- Client appears organized but unclear on data quality issues.
+- POS API rate limit is 200 requests/min → need batching or caching layer.
+- They want “insights” but not true ML (set expectations early).
+- Dashboard should filter by: region → store → timeframe.
+- Alerts: email + in-app.
+- Budget: Mid-range but timeline is aggressive.
+- UI needs to be simple; they were excited about clean dark-mode examples we showed.

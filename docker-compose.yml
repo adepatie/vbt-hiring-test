@@ -1,4 +1,30 @@
 services:
+  app:
+    build:
+      context: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./uploads:/app/uploads
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -f http://localhost:3000/api/health/db || exit 1"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
   postgres:
     image: postgres:16
     container_name: vbt-postgres
@@ -17,6 +43,26 @@ services:
       timeout: 5s
       retries: 5
 
+  postgres-test:
+    image: postgres:16
+    container_name: vbt-postgres-test
+    restart: unless-stopped
+    profiles: ["test"]
+    ports:
+      - "5440:5432"
+    environment:
+      POSTGRES_USER: vbt
+      POSTGRES_PASSWORD: vbt
+      POSTGRES_DB: vbt_hiring_test_test
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vbt -d vbt_hiring_test_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   postgres_data:
+  postgres_test_data:
 

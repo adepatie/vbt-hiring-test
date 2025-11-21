@@ -1,27 +1,19 @@
-import { estimatesService } from "@/lib/services/estimatesService";
-import { ProjectList, type ProjectListProject } from "./project-list";
+import { MessageSquare } from "lucide-react";
+import { CreateProjectButton } from "./create-project-button";
 
-export default async function EstimatesPage() {
-  const projects = await estimatesService.listProjects();
-
-  const serializableProjects: ProjectListProject[] = projects.map((project) => ({
-    id: project.id,
-    name: project.name,
-    clientName: project.clientName ?? null,
-    stage: project.stage,
-    updatedAt: project.updatedAt.toISOString(),
-  }));
-
+export default function EstimatesPage() {
   return (
-    <main className="container max-w-6xl py-10 md:py-16 space-y-8">
+    <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
+      <div className="rounded-full bg-muted p-4">
+        <MessageSquare className="h-8 w-8 text-muted-foreground" />
+      </div>
       <div className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">Estimates</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Select a project</h1>
         <p className="text-muted-foreground">
-          Track every project estimate, manage stage progress, and capture new work in one place.
+          Choose a project from the sidebar or create a new one to get started.
         </p>
       </div>
-      <ProjectList projects={serializableProjects} />
-    </main>
+      <CreateProjectButton />
+    </div>
   );
 }
-

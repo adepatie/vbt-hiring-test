@@ -4,17 +4,17 @@ import path from "path";
 export default defineConfig({
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "."),
+      "@": path.resolve(__dirname, "./"),
     },
   },
   test: {
     globals: true,
-    environment: "node",
-    include: ["tests/**/*.test.ts"],
+    environment: "jsdom",
+    setupFiles: ["./vitest.setup.ts"],
+    include: ["tests/**/*.test.{ts,tsx}"],
+    exclude: ["tests/integration/**"],
     coverage: {
       enabled: false,
     },
   },
 });
-
-

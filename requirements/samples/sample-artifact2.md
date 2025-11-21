@@ -1,0 +1,11 @@
+- Primary goal: real-time regional performance dashboard.
+- Users: regional managers, operations leads.
+- KPIs: revenue, foot traffic, staff coverage, conversion rate.
+- Must support threshold-based alerts.
+- Integrations:
+  - CloudRetailPro (sales data)
+  - RosterPro (staff scheduling)
+- MVP does NOT include:
+  - HR metrics
+  - Forecasting or AI-driven insights (later phase)
+- Client stressed urgency due to Q4 planning.
