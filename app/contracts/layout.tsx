@@ -3,6 +3,8 @@ import { ArrowLeft, FileText, Plus, Search, Scale, Calculator } from "lucide-rea
 import { contractsService } from "@/lib/services/contractsService";
 import { ContractGenerationProvider } from "./contract-generation-context";
 
+export const dynamic = "force-dynamic";
+
 export default async function ContractsLayout({
   children,
 }: {

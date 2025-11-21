@@ -59,6 +59,7 @@ const THROTTLED_TOOL_NAMES = new Set<string>([
   "contracts.createFromProject",
   "contracts.createVersion",
   "contracts.updateNotes",
+  "contracts.applyProposals",
 ]);
 
 const MUTATION_THROTTLE_WINDOW_MS = 60_000;
@@ -569,6 +570,17 @@ async function recordValidationSnapshot({
   return "Validation analysis complete.";
 }
 
+async function noteAppliedProposals({
+  input,
+}: {
+  input: unknown;
+}) {
+  const agreementId = (input as any).agreementId;
+  return agreementId
+    ? `Applied accepted proposals and saved a new version for agreement ${agreementId}.`
+    : "Applied accepted proposals and saved a new agreement version.";
+}
+
 export const SIDE_EFFECTS: Record<string, SideEffectHandler[]> = {
   "estimates.generateWbsItems": [recalculateQuoteTotals, maybeRegenerateQuoteTerms],
   "estimates.upsertWbsItems": [recalculateQuoteTotals, maybeRegenerateQuoteTerms],
@@ -577,6 +589,7 @@ export const SIDE_EFFECTS: Record<string, SideEffectHandler[]> = {
   "quote.updatePricingDefaults": [updatePricingDefaultsForFutureQuotesOnly],
   "roles.update": [recalculateQuotesForRoleProjects],
   "contracts.validateAnalysis": [recordValidationSnapshot],
+  "contracts.applyProposals": [noteAppliedProposals],
 };
 
 // --- Helper: executeToolCalls ---
@@ -764,12 +777,12 @@ export async function executeToolCalls({
         tool: internalName,
         workflow,
         entityId,
-        status: invocationStatus === "blocked" ? "blocked" : "error",
+        status: "error",
         message: friendlyError.summary,
       });
       setNormalizedContentFromError(
         friendlyError,
-        invocationStatus === "blocked" ? "blocked" : "error",
+        "error",
       );
     }
 

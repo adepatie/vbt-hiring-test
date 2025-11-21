@@ -50,7 +50,7 @@ export const settingsService = {
       },
     });
 
-    revalidateTag(QUOTE_SETTINGS_TAG);
+    (revalidateTag as any)(QUOTE_SETTINGS_TAG);
     return record;
   },
 };

@@ -172,6 +172,17 @@ async function recordValidationSnapshot({
   return "Validation analysis complete.";
 }
 
+async function noteAppliedProposals({
+  input,
+}: {
+  input: unknown;
+}) {
+  const agreementId = (input as any).agreementId;
+  return agreementId
+    ? `Applied accepted proposals and saved a new version for agreement ${agreementId}.`
+    : "Applied accepted proposals and saved a new agreement version.";
+}
+
 export const SIDE_EFFECTS: Record<string, SideEffectHandler[]> = {
   "estimates.generateWbsItems": [recalculateQuoteTotals, maybeRegenerateQuoteTerms],
   "estimates.upsertWbsItems": [recalculateQuoteTotals, maybeRegenerateQuoteTerms],
@@ -180,6 +191,7 @@ export const SIDE_EFFECTS: Record<string, SideEffectHandler[]> = {
   "quote.updatePricingDefaults": [updatePricingDefaultsForFutureQuotesOnly],
   "roles.update": [recalculateQuotesForRoleProjects],
   "contracts.validateAnalysis": [recordValidationSnapshot],
+  "contracts.applyProposals": [noteAppliedProposals],
 };
 
 // --- Helpers ---

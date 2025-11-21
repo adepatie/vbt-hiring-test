@@ -1,8 +1,13 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
-
-const ORIGINAL_SNIPPET_LIMIT = 200;
-const PROPOSED_SNIPPET_LIMIT = 80;
+import { contractsService } from "@/lib/services/contractsService";
+import {
+  buildProposalId,
+  computeFinalDraft,
+  ProposalDecisionMap,
+  ProposalTextChange,
+} from "@/lib/contracts/proposalUtils";
 
 const decisionSchema = z.enum(["accepted", "rejected", "pending"]);
 
@@ -16,38 +21,7 @@ const proposalSchema = z.object({
 
 const agreementIdSchema = z.string().cuid();
 
-const normalizeSnippet = (value: string, limit: number) =>
-  value.replace(/\s+/g, " ").trim().slice(0, limit);
-
-const fnv1aHash = (value: string) => {
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < value.length; i += 1) {
-    hash ^= value.charCodeAt(i);
-    hash +=
-      (hash << 1) +
-      (hash << 4) +
-      (hash << 7) +
-      (hash << 8) +
-      (hash << 24);
-  }
-  return (hash >>> 0).toString(16);
-};
-
-export const buildProposalId = (
-  agreementId: string,
-  index: number,
-  originalText: string,
-  proposedText: string,
-) => {
-  const payload = `${agreementId}:${index}:${normalizeSnippet(originalText, ORIGINAL_SNIPPET_LIMIT)}:${normalizeSnippet(proposedText, PROPOSED_SNIPPET_LIMIT)}`;
-  return `prop_${fnv1aHash(payload)}`;
-};
-
-export type PersistedProposal = {
-  id: string;
-  originalText: string;
-  proposedText: string;
-  rationale: string;
+export type PersistedProposal = ProposalTextChange & {
   decision: "accepted" | "rejected" | "pending";
 };
 
@@ -112,5 +86,109 @@ export async function saveReviewStateToDb(
   });
 
   return merged as PersistedProposal[];
+}
+
+type ApplyProposalOptions = {
+  agreementId: string;
+  decisions?: ProposalDecisionMap;
+  changeNote?: string;
+  markApproved?: boolean;
+};
+
+export async function applyAcceptedProposalsToAgreement({
+  agreementId,
+  decisions,
+  changeNote,
+  markApproved = true,
+}: ApplyProposalOptions) {
+  const idResult = agreementIdSchema.safeParse(agreementId);
+  if (!idResult.success) {
+    throw new Error("Agreement ID required");
+  }
+
+  const agreement = await prisma.agreement.findUnique({
+    where: { id: idResult.data },
+    include: {
+      versions: {
+        orderBy: { versionNumber: "asc" },
+        take: 1,
+      },
+    },
+  });
+
+  if (!agreement) {
+    throw new Error(`Agreement ${idResult.data} not found.`);
+  }
+
+  const baseVersion = agreement.versions[0];
+  if (!baseVersion || !baseVersion.content) {
+    throw new Error("Unable to locate the original draft for this agreement.");
+  }
+
+  const storedProposals =
+    ((agreement.reviewData as { proposals?: PersistedProposal[] } | null)?.proposals ??
+      []).map((proposal, index) => ({
+        ...proposal,
+        id:
+          proposal.id ??
+          buildProposalId(
+            idResult.data,
+            index,
+            proposal.originalText ?? "",
+            proposal.proposedText ?? "",
+          ),
+        decision: proposal.decision ?? "pending",
+      }));
+
+  if (!storedProposals.length) {
+    throw new Error("No proposals available to apply.");
+  }
+
+  const appliedDecisions: ProposalDecisionMap = decisions
+    ? { ...decisions }
+    : storedProposals.reduce<ProposalDecisionMap>((map, proposal) => {
+        map[proposal.id] = proposal.decision ?? "pending";
+        return map;
+      }, {});
+
+  const finalResult = computeFinalDraft({
+    originalDraft: baseVersion.content,
+    proposals: storedProposals,
+    decisions: appliedDecisions,
+  });
+
+  if (finalResult.acceptedCount === 0) {
+    throw new Error("No accepted proposals to apply.");
+  }
+
+  const summary =
+    changeNote ??
+    `${finalResult.acceptedCount} change${finalResult.acceptedCount === 1 ? "" : "s"} applied from policy review.`;
+
+  const version = await contractsService.createVersion({
+    agreementId: idResult.data,
+    content: finalResult.finalContent,
+    changeNote: summary,
+  });
+
+  if (markApproved) {
+    await contractsService.updateAgreementStatus({
+      id: idResult.data,
+      status: "APPROVED",
+    });
+  }
+
+  await prisma.agreement.update({
+    where: { id: idResult.data },
+    data: { reviewData: Prisma.JsonNull },
+  });
+
+  return {
+    agreementId: idResult.data,
+    version,
+    finalContent: finalResult.finalContent,
+    acceptedCount: finalResult.acceptedCount,
+    changeNote: summary,
+  };
 }
 

@@ -21,6 +21,7 @@ import { estimatesService } from "../../services/estimatesService";
 import { generateContractDraftForAgreement } from "@/lib/server/contractGeneration";
 import { callWithContentRetry } from "../llmUtils";
 import { CopilotLLMMessage } from "../../copilot/types";
+import { applyAcceptedProposalsToAgreement } from "@/lib/server/contractReview";
 
 export async function handleListAgreements(
   input: ListAgreementsInput,
@@ -270,5 +271,29 @@ export async function handleUpdateContractNotes(input: {
   return {
     content: JSON.stringify(agreement),
     raw: agreement,
+  };
+}
+
+export async function handleApplyContractProposals(input: {
+  agreementId: string;
+  decisions?: Record<string, "accepted" | "rejected" | "pending">;
+  changeNote?: string;
+  markApproved?: boolean;
+}): Promise<McpLLMResponse> {
+  const result = await applyAcceptedProposalsToAgreement({
+    agreementId: input.agreementId,
+    decisions: input.decisions,
+    changeNote: input.changeNote,
+    markApproved: input.markApproved,
+  });
+
+  return {
+    content: JSON.stringify({
+      agreementId: result.agreementId,
+      versionId: result.version.id,
+      acceptedCount: result.acceptedCount,
+      changeNote: result.changeNote,
+    }),
+    raw: result,
   };
 }

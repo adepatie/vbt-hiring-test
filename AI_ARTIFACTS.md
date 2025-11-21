@@ -1,6 +1,9 @@
 ## AI Artifacts
 Listed below is a selection of prompts that clearly demonstrate how I was able to use the agent to build this application. Instead of pasting 5000 lines of code and error debugging, I have chosen a few prompt that show what I feel were effective prompt usage. I also will include a few chaotic ones. I have removed most of the code from the chats and have only kept it where it is relevant. 
 
+Here is a link to the ChatGPT session I had going while working on this:
+https://chatgpt.com/share/691fb58a-5618-8002-a9ce-ce1070178e30
+
 
 >I began with an architectural planning prompt that I generated and refined using ChatGPT
 
@@ -1475,7 +1478,7 @@ The main view is now configured to take up the remaining space on the page:
 - **Layout main area** (`app/estimates/layout.tsx`): updated the `<main>` to `className="flex-1 flex min-h-0 flex-col h-full overflow-hidden bg-background relative"` so it can stretch and scroll correctly inside the viewport.
 - **Project flow content** (`project-flow-view.tsx`): the root content wrapper and inner flex row now use `min-h-0`, and the central main area uses `className="flex-1 min-w-0 min-h-0 overflow-y-auto relative"` so the main panel expands to fill all remaining space between the stage sidebar and timeline while allowing proper scrolling.
 
-> It didn't actually accomplish this sop I went in and removed the remaining css classes causing it to shrink
+> It didn't actually accomplish this so I went in and removed the remaining css classes causing it to shrink
 
 ---
 

@@ -43,7 +43,7 @@ export async function GET(
       artifact.originalName ??
       `${artifact.type ?? "artifact"}${path.extname(artifact.storedFile)}`;
 
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(new Blob([fileBuffer as any]), {
       status: 200,
       headers: {
         "Content-Type": artifact.mimeType ?? "application/octet-stream",

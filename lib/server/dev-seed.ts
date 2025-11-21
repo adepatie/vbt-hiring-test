@@ -137,7 +137,7 @@ export async function seedDevProject(
       projectName: project.name,
       type: descriptor.type,
       notes: descriptor.notes,
-      file,
+      file: file as any,
     });
     artifacts.push(artifact);
   }

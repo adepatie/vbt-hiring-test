@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 import { estimatesService } from "@/lib/services/estimatesService";
 import { contractsService } from "@/lib/services/contractsService";
 
+export const dynamic = "force-dynamic";
+
 const countFormatter = new Intl.NumberFormat("en-US");
 const timestampFormatter = new Intl.DateTimeFormat("en", {
   dateStyle: "medium",

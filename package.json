@@ -15,7 +15,10 @@
     "seed": "npx prisma db seed",
     "seed:prod": "SEED_DB_TARGET=prod npx prisma db seed",
     "seed:test": "SEED_DB_TARGET=test DOTENV_CONFIG_PATH=env/test.env npx prisma db seed",
-    "seed:demo": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seedDemoData.ts",
+    "seed:demo": "ts-node --compiler-options '{\"module\":\"CommonJS\",\"moduleResolution\":\"node\"}' prisma/seedDemoData.ts",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f app",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:reset": "docker compose down -v && docker compose up -d postgres",
@@ -76,6 +79,6 @@
     "vitest": "^1.6.0"
   },
   "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\",\"moduleResolution\":\"node\"} prisma/seed.ts"
   }
 }

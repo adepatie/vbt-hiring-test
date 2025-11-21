@@ -25,6 +25,7 @@ import {
   validateContractSchema,
   createContractVersionSchema,
   updateContractNotesSchema,
+  applyContractProposalsSchema,
 } from "./schemas";
 import type { McpLLMResponse } from "./types";
 import { mcpLLMServer } from "./server";
@@ -201,6 +202,13 @@ export const MCP_TOOLS: Record<string, ToolDefinition> = {
     description: "Update the notes for an agreement.",
     schema: updateContractNotesSchema,
     execute: (input) => mcpLLMServer.handleUpdateContractNotes(input),
+  },
+  "contracts.applyProposals": {
+    name: "contracts.applyProposals",
+    description:
+      "Apply accepted policy review proposals to an agreement and save a new version.",
+    schema: applyContractProposalsSchema,
+    execute: (input) => mcpLLMServer.handleApplyContractProposals(input),
   },
 };
 

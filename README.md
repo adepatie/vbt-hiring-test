@@ -186,6 +186,8 @@ Certain tools trigger additional domain behavior automatically:
   - `roles.update` runs `recalculateQuotesForRoleProjects`, which currently returns a note reminding users that existing quotes are not automatically recalculated.
 - **Contracts validation**:
   - `contracts.validateAnalysis` runs `recordValidationSnapshot`, which currently returns a note that validation analysis has completed (hook for future persistence).
+- **Contracts proposals**:
+  - `contracts.applyProposals` applies accepted review proposals, saves a new agreement version, and clears the pending review state.
 
 ### Copilot Chat UI Wiring
 

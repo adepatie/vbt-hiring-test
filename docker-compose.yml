@@ -2,6 +2,8 @@ services:
   app:
     build:
       context: .
+      args:
+        DATABASE_URL: ${DATABASE_URL}
     restart: unless-stopped
     depends_on:
       postgres:
@@ -10,6 +12,7 @@ services:
       - .env
     environment:
       NODE_ENV: production
+      DATABASE_URL: postgresql://vbt:vbt@postgres:5432/vbt_hiring_test
     ports:
       - "3000:3000"
     volumes:

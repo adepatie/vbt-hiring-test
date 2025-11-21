@@ -309,7 +309,7 @@ export async function callProviderLLM({
   const body: Record<string, unknown> = {
     model: config.model,
     messages: payloadMessages,
-    max_completion_tokens: effectiveMaxTokens,
+    max_tokens: effectiveMaxTokens,
   };
 
   if (responseFormat === "json_object") {

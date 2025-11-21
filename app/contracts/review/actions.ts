@@ -3,8 +3,9 @@
 import { contractsService } from "@/lib/services/contractsService";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
-import { buildProposalId, saveReviewStateToDb } from "@/lib/server/contractReview";
+import { saveReviewStateToDb } from "@/lib/server/contractReview";
 import { Prisma } from "@prisma/client";
+import { buildProposalId } from "@/lib/contracts/proposalUtils";
 
 export async function createIncomingAgreementAction(formData: FormData) {
   const type = formData.get("type");

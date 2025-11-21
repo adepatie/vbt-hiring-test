@@ -158,6 +158,7 @@ CRITICAL INSTRUCTIONS:
 - For WBS items, use \`estimates.generateWbsItems\`.
 - For Quotes, use \`quote.generateTerms\` or \`quote.updatePricingDefaults\`.
 - For Contracts, use \`contracts.create\`, \`contracts.createFromProject\`, \`contracts.generateDraft\`, etc.
+- To approve policy review proposals, call \`contracts.applyProposals\` (requires the contracts workflow with an agreement selected).
 - If the user asks a question about the project, use \`estimates.getProjectDetails\` first.
 - If the user asks about roles, use \`roles.list\`.
 ${readOnlyInstruction}

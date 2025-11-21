@@ -107,7 +107,7 @@ const CONTRACT_ENTITY_RULES: Record<
   },
   agreementNotes: {
     label: "agreement notes",
-    lockedStatuses: ["APPROVED"],
+    lockedStatuses: [],
   },
 };
 

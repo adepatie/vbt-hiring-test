@@ -17,91 +17,16 @@ import { createIncomingAgreementAction, saveReviewedVersionAction, saveReviewSta
 import { PolicyOverrideSelector } from "../components/policy-override-selector";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import {
+  buildProposalId,
+  computeFinalDraft,
+  ProposalDecision as ProposalDecisionType,
+  ProposalTextChange,
+  segmentProposalDocument,
+} from "@/lib/contracts/proposalUtils";
 
-interface Proposal {
-  originalText: string;
-  proposedText: string;
-  rationale: string;
-  id: string;
-  decision?: Decision;
-}
-
-type Decision = "accepted" | "rejected" | "pending";
-
-const ORIGINAL_SNIPPET_LIMIT = 200;
-const PROPOSED_SNIPPET_LIMIT = 80;
-
-const normalizeSnippet = (value: string, limit: number) =>
-  value.replace(/\s+/g, " ").trim().slice(0, limit);
-
-const fnv1aHash = (value: string) => {
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < value.length; i += 1) {
-    hash ^= value.charCodeAt(i);
-    hash +=
-      (hash << 1) +
-      (hash << 4) +
-      (hash << 7) +
-      (hash << 8) +
-      (hash << 24);
-  }
-  return (hash >>> 0).toString(16);
-};
-
-const buildProposalId = (
-  agreementId: string,
-  index: number,
-  originalText: string,
-  proposedText: string,
-) => {
-  const payload = `${agreementId}:${index}:${normalizeSnippet(originalText, ORIGINAL_SNIPPET_LIMIT)}:${normalizeSnippet(proposedText, PROPOSED_SNIPPET_LIMIT)}`;
-  return `prop_${fnv1aHash(payload)}`;
-};
-
-const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-const buildWhitespaceFlexiblePattern = (value: string) => {
-  const normalized = value.replace(/\s+/g, " ").trim();
-  if (!normalized) return null;
-
-  return normalized
-    .split(" ")
-    .map((token) => escapeRegex(token))
-    .join("\\s+");
-};
-
-const findProposalMatch = (fullText: string, originalText: string, fromIndex: number) => {
-  if (!originalText || !originalText.length) {
-    return null;
-  }
-
-  const exactIndex = fullText.indexOf(originalText, fromIndex);
-  if (exactIndex !== -1) {
-    return { index: exactIndex, matchedText: originalText };
-  }
-
-  const flexiblePattern = buildWhitespaceFlexiblePattern(originalText);
-  if (!flexiblePattern) {
-    return null;
-  }
-
-  const regex = new RegExp(flexiblePattern, "i");
-  const slice = fullText.slice(fromIndex);
-  const match = regex.exec(slice);
-
-  if (!match || typeof match.index !== "number") {
-    return null;
-  }
-
-  const index = fromIndex + match.index;
-  const matchedText = fullText.slice(index, index + match[0].length);
-
-  return { index, matchedText };
-};
-
-type DocumentSegment =
-  | { type: "text"; content: string }
-  | { type: "proposal"; proposal: Proposal; matchedText: string };
+type Proposal = ProposalTextChange;
+type Decision = ProposalDecisionType;
 
 interface ReviewInterfaceProps {
   agreementId?: string;
@@ -327,101 +252,21 @@ export default function ReviewInterface({ agreementId, variant = "standalone" }:
 
   // Segmentation Logic
   // We split the original text into segments: "text" (unchanged) or "proposal" (needs diff view)
-  const { segments, unmatchedProposals } = useMemo<{
-    segments: DocumentSegment[];
-    unmatchedProposals: Proposal[];
-  }>(() => {
-    if (!originalDraft) {
-        return {
-            segments: [],
-            unmatchedProposals: proposals,
-        };
-    }
-
-    if (proposals.length === 0) {
-        return {
-            segments: [{ type: "text", content: originalDraft }],
-            unmatchedProposals: [],
-        };
-    }
-
-    const sortedProposals = [...proposals].sort((a, b) => {
-        const idxA = originalDraft.indexOf(a.originalText);
-        const idxB = originalDraft.indexOf(b.originalText);
-        return idxA - idxB;
-    });
-
-    const segs: DocumentSegment[] = [];
-    const unmatched: Proposal[] = [];
-    let lastIndex = 0;
-
-    for (const proposal of sortedProposals) {
-        const match = findProposalMatch(originalDraft, proposal.originalText, lastIndex);
-
-        if (!match) {
-            unmatched.push(proposal);
-            continue;
-        }
-
-        const { index, matchedText } = match;
-
-        if (index > lastIndex) {
-            segs.push({
-                type: "text",
-                content: originalDraft.slice(lastIndex, index),
-            });
-        }
-
-        segs.push({
-            type: "proposal",
-            proposal,
-            matchedText,
-        });
-
-        lastIndex = index + matchedText.length;
-    }
-
-    if (lastIndex < originalDraft.length) {
-        segs.push({
-            type: "text",
-            content: originalDraft.slice(lastIndex),
-        });
-    }
-
-    return { segments: segs, unmatchedProposals: unmatched };
+  const { segments, unmatchedProposals } = useMemo(() => {
+    return segmentProposalDocument(originalDraft, proposals);
   }, [originalDraft, proposals]);
-
-  function computeFinalDraft(): string {
-      let final = originalDraft;
-      
-      // Filter for accepted proposals ONLY
-      const acceptedList = proposals.filter(p => decisions[p.id] === "accepted");
-      
-      // Apply replacements
-      // Note: Replacing sequentially in the original string is tricky if we don't handle indices.
-      // But since we are replacing 'originalText' which comes from the source, 
-      // AND assuming we replace them in order of occurrence (or just globally if unique),
-      // we need to be careful.
-      
-      // Robust approach: Reconstruct from segments.
-      // If we use the segments derived above, we can just map them to string.
-      
-      return segments.map(seg => {
-          if (seg.type === "text") return seg.content;
-          if (seg.type === "proposal") {
-              if (decisions[seg.proposal.id] === "accepted") {
-                  return seg.proposal.proposedText;
-              }
-              return seg.matchedText;
-          }
-          return "";
-      }).join("");
-  }
 
   async function handleConfirmChanges() {
     if (!currentAgreementId) return;
     
-    const finalContent = computeFinalDraft();
+    const finalResult = computeFinalDraft({
+      originalDraft,
+      proposals,
+      decisions,
+      segments,
+      unmatchedProposals,
+    });
+    const finalContent = finalResult.finalContent;
     const changeCount = Object.values(decisions).filter(d => d === "accepted").length;
     const summary = `${changeCount} change${changeCount === 1 ? '' : 's'} applied from policy review.`;
 

@@ -243,7 +243,7 @@ export function WbsEditor({
       const total = subtotal + overheadFee;
 
       // 3. Build WBS summary
-      const wbsSummary = buildWbsSummaryFromRoleOptions(validItems, roles);
+      const wbsSummary = buildWbsSummaryFromRoleOptions(validItems as any, roles);
 
       // 4. Generate quote terms
       const result = await callCopilot<{

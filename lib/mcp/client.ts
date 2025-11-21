@@ -16,6 +16,12 @@ import {
   McpUpdateRoleRequest,
   McpReviewContractDraftRequest,
   ContractReviewRequestInput,
+  McpGetPricingDefaultsRequest,
+  McpUpdatePricingDefaultsRequest,
+  McpGenerateQuoteTermsRequest,
+  QuoteTermsRequestInput,
+  McpApplyContractProposalsRequest,
+  ContractApplyProposalsInput,
 } from "./types";
 import { mcpLLMServer } from "./server";
 import { copilotErrorFromPayload } from "./errorHelpers";
@@ -23,7 +29,7 @@ import { copilotErrorFromPayload } from "./errorHelpers";
 async function invokeMcp<T extends { tool: string }>(
   request: T,
 ): Promise<McpLLMResponse> {
-  const response = await mcpLLMServer.handle(request);
+  const response = await mcpLLMServer.handle(request as any);
 
   if ("error" in response) {
     throw copilotErrorFromPayload(response.error);
@@ -141,6 +147,15 @@ export async function mcpReviewContractDraft(
 ): Promise<McpLLMResponse> {
   return invokeMcp<McpReviewContractDraftRequest>({
     tool: "contracts.reviewDraft",
+    input,
+  });
+}
+
+export async function mcpApplyContractProposals(
+  input: ContractApplyProposalsInput,
+): Promise<McpLLMResponse> {
+  return invokeMcp<McpApplyContractProposalsRequest>({
+    tool: "contracts.applyProposals",
     input,
   });
 }

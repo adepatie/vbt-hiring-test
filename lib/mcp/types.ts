@@ -22,7 +22,10 @@ export type McpToolName =
   | "contracts.reviewDraft"
   | "contracts.validateAnalysis"
   | "contracts.listAgreements"
-  | "contracts.getAgreement";
+  | "contracts.getAgreement"
+  | "contracts.createVersion"
+  | "contracts.updateNotes"
+  | "contracts.applyProposals";
 
 export interface McpBaseRequest {
   requestId?: string;
@@ -242,6 +245,18 @@ export interface McpValidateContractRequest extends McpBaseRequest {
   input: ContractValidationRequestInput;
 }
 
+export interface ContractApplyProposalsInput {
+  agreementId: string;
+  decisions?: Record<string, "accepted" | "rejected" | "pending">;
+  changeNote?: string;
+  markApproved?: boolean;
+}
+
+export interface McpApplyContractProposalsRequest extends McpBaseRequest {
+  tool: "contracts.applyProposals";
+  input: ContractApplyProposalsInput;
+}
+
 export type McpRequest =
   | McpChatRequest
   | McpGenerateBusinessCaseRequest
@@ -261,7 +276,8 @@ export type McpRequest =
   | McpValidateContractRequest
   | McpGetProjectDetailsRequest
   | McpListAgreementsRequest
-  | McpGetAgreementRequest;
+  | McpGetAgreementRequest
+  | McpApplyContractProposalsRequest;
 
 export interface McpLLMResponse {
   content: string;

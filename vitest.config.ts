@@ -14,6 +14,7 @@ export default defineConfig({
     include: ["tests/**/*.test.{ts,tsx}"],
     exclude: ["tests/integration/**"],
     coverage: {
+      provider: "v8",
       enabled: false,
     },
   },

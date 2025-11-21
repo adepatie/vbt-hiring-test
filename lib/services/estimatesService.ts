@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, type Role, type WBSItem } from "@prisma/client";
 import { z } from "zod";
 import {
   artifactInputSchema,
@@ -213,14 +213,14 @@ async function ensureDefaultRolesSeeded() {
   }
 }
 
-const serializeRole = (role: Prisma.Role) =>
+const serializeRole = (role: Role) =>
   roleSchema.parse({
     ...role,
     rate: formatDecimal(role.rate),
   });
 
 const presentWbsItem = (
-  item: Prisma.WBSItem & { role: Prisma.Role | null },
+  item: WBSItem & { role: Role | null },
 ) => {
   if (!item.roleId || !item.role) {
     throw new EstimatesError(
@@ -375,10 +375,10 @@ type NormalizedWbsItemWithRole = {
 async function normalizeWbsItemsWithRoles(
   items: WbsItemsWithRolesInput,
 ): Promise<NormalizedWbsItemWithRole[]> {
-  const roleCacheById = new Map<string, Prisma.Role>();
-  const roleCacheByName = new Map<string, Prisma.Role>();
+  const roleCacheById = new Map<string, Role>();
+  const roleCacheByName = new Map<string, Role>();
 
-  const rememberRole = (role: Prisma.Role) => {
+  const rememberRole = (role: Role) => {
     roleCacheById.set(role.id, role);
     roleCacheByName.set(role.name.trim().toLowerCase(), role);
   };
@@ -403,7 +403,7 @@ async function normalizeWbsItemsWithRoles(
   };
 
   const updateRoleRateIfNeeded = async (
-    role: Prisma.Role,
+    role: Role,
     incomingRate?: number,
   ) => {
     if (incomingRate === undefined) {
@@ -637,7 +637,7 @@ export const estimatesService = {
       hasApprovedAgreement: lockState.hasApprovedAgreement,
     });
 
-    const delegate = mapStageToDelegate(data.stage);
+    const delegate = mapStageToDelegate(data.stage) as any;
     const payload = {
       content: data.content,
       approved: data.approved ?? false,

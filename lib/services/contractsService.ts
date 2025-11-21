@@ -80,7 +80,7 @@ export const contractsService = {
   ) {
     const parsed = createExampleAgreementSchema.parse(input);
     return prisma.exampleAgreement.create({
-      data: parsed,
+      data: parsed as any,
     });
   },
 

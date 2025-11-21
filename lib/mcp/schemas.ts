@@ -141,3 +141,14 @@ export const updateContractNotesSchema = z
     notes: z.string().min(1).max(2000),
   })
   .strict();
+
+export const applyContractProposalsSchema = z
+  .object({
+    agreementId: z.string().cuid(),
+    decisions: z
+      .record(z.enum(["accepted", "rejected", "pending"]))
+      .optional(),
+    changeNote: z.string().max(2000).optional(),
+    markApproved: z.boolean().optional(),
+  })
+  .strict();

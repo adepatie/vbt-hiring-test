@@ -32,7 +32,7 @@ export default async function PoliciesPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <form action={createPolicyAction} className="flex gap-2">
+                <form action={createPolicyAction as unknown as (formData: FormData) => void} className="flex gap-2">
                   <Input 
                     name="description" 
                     placeholder="Add a new policy rule..." 
@@ -49,7 +49,7 @@ export default async function PoliciesPage() {
                       className="flex items-center justify-between p-3 bg-muted/50 rounded-md group"
                     >
                       <span className="text-sm">{policy.description}</span>
-                      <form action={deletePolicyAction.bind(null, policy.id)}>
+                      <form action={deletePolicyAction.bind(null, policy.id) as unknown as (formData: FormData) => void}>
                         <Button 
                           variant="ghost" 
                           size="icon" 
@@ -80,7 +80,7 @@ export default async function PoliciesPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <form action={createExampleAction} className="space-y-4 border-b pb-6">
+                <form action={createExampleAction as unknown as (formData: FormData) => void} className="space-y-4 border-b pb-6">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Name</Label>
@@ -123,7 +123,7 @@ export default async function PoliciesPage() {
                         <span className="text-sm font-medium">{example.name}</span>
                         <span className="text-xs text-muted-foreground">{example.type}</span>
                       </div>
-                      <form action={deleteExampleAction.bind(null, example.id)}>
+                      <form action={deleteExampleAction.bind(null, example.id) as unknown as (formData: FormData) => void}>
                         <Button 
                           variant="ghost" 
                           size="icon" 

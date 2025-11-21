@@ -20,6 +20,7 @@ const CONTRACT_AGREEMENT_CONTEXT_TOOLS = new Set<string>([
   "contracts.validateAnalysis",
   "contracts.createVersion",
   "contracts.updateNotes",
+  "contracts.applyProposals",
 ]);
 
 type ToolArgs = Record<string, unknown>;

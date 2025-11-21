@@ -37,6 +37,7 @@ import {
   handleValidateContract,
   handleCreateContractVersion,
   handleUpdateContractNotes,
+  handleApplyContractProposals,
 } from "./handlers/contracts";
 import {
   handleCreateRole,
@@ -256,6 +257,15 @@ export class McpLLMServer {
     notes: string;
   }): Promise<McpLLMResponse> {
     return handleUpdateContractNotes(input);
+  }
+
+  async handleApplyContractProposals(input: {
+    agreementId: string;
+    decisions?: Record<string, "accepted" | "rejected" | "pending">;
+    changeNote?: string;
+    markApproved?: boolean;
+  }): Promise<McpLLMResponse> {
+    return handleApplyContractProposals(input);
   }
 }
 

@@ -56,6 +56,14 @@ const WBS_COMPLETION_TOKENS = Number(
   process.env.LLM_EFFORT_MAX_OUTPUT_TOKENS ?? 1800,
 );
 const WBS_MAX_ITEMS = Number(process.env.LLM_WBS_MAX_ITEMS ?? 18);
+const QUOTE_TERMS_COMPLETION_TOKENS = Number(
+  process.env.LLM_QUOTE_TERMS_MAX_OUTPUT_TOKENS ?? 2400,
+);
+const QUOTE_TERMS_MAX_TOKENS = Math.max(
+  QUOTE_TERMS_COMPLETION_TOKENS * 2,
+  4800,
+);
+const QUOTE_TERMS_MAX_ATTEMPTS = 2;
 
 export async function handleGetProjectDetails(
   input: GetProjectDetailsInput,
@@ -80,7 +88,7 @@ export async function handleSearchProjects(input: {
 export async function handleUpsertWbsItems(
   input: z.infer<typeof upsertWbsItemsSchema>,
 ): Promise<McpLLMResponse> {
-  const updatedItems = await estimatesService.upsertWbsItemsWithRoles(input);
+  const updatedItems = await estimatesService.upsertWbsItemsWithRoles(input as any);
 
   return {
     content: JSON.stringify({ items: updatedItems }),
@@ -91,7 +99,7 @@ export async function handleUpsertWbsItems(
 export async function handleRemoveWbsItems(
   input: z.infer<typeof removeWbsItemsSchema>,
 ): Promise<McpLLMResponse> {
-  const updatedItems = await estimatesService.removeWbsItems(input);
+  const updatedItems = await estimatesService.removeWbsItems(input as any);
 
   return {
     content: JSON.stringify({ items: updatedItems }),
@@ -533,20 +541,30 @@ export async function handleGenerateQuoteTerms(
     instructions: input.instructions ?? undefined,
   });
 
-  const QUOTE_TERMS_COMPLETION_TOKENS = Number(
-    process.env.LLM_QUOTE_TERMS_MAX_OUTPUT_TOKENS ?? 2400,
-  );
-
-  const result = await callProviderLLM({
-    systemPrompt,
-    messages: messages as CopilotLLMMessage[],
-    maxTokens: QUOTE_TERMS_COMPLETION_TOKENS,
-    temperature: 0.3,
-    responseFormat: "json_object",
+  const { content, result } = await callWithContentRetry({
+    label: "quote_terms",
+    initialTokens: QUOTE_TERMS_COMPLETION_TOKENS,
+    maxTokens: QUOTE_TERMS_MAX_TOKENS,
+    maxAttempts: QUOTE_TERMS_MAX_ATTEMPTS,
+    callFactory: (maxTokens) =>
+      callProviderLLM({
+        systemPrompt,
+        messages: messages as CopilotLLMMessage[],
+        maxTokens,
+        temperature: 0.3,
+        responseFormat: "json_object",
+      }),
   });
 
-  const content = (result.content ?? "").trim();
   if (!content.length) {
+    const finishReason = (result.finishReason ?? "").toLowerCase();
+    if (finishReason === "length") {
+      throw new CopilotLLMError(
+        "Copilot ran out of tokens before returning quote terms. Try increasing LLM_QUOTE_TERMS_MAX_OUTPUT_TOKENS and try again.",
+        "server",
+      );
+    }
+
     throw new CopilotLLMError(
       "Copilot did not return any quote terms content.",
       "server",
